@@ -4,6 +4,8 @@
 #
 import vivotools as vt
 
+print "Tools version", vt.__version__
+
 print vt.get_person("http://vivo.ufl.edu/individual/n13049") # Richard Macmaster
 print vt.get_person("http://vivo.ufl.edu/individual/n3698",get_positions=True) # Chelsea Dinsmore
 print vt.get_person("http://vivo.ufl.edu/individual/n25562",get_positions=True) # Mike Conlon

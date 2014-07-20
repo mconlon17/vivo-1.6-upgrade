@@ -1,0 +1,108 @@
+CHANGELOG
+
+    Version 0.0 MC 2013-04-06
+     -- Read HR data and UFID person data from VIVO.  Compare. Identify and
+        tabulate cases
+    Version 0.1 MC 2013-05-28
+     -- Add exception processing for departments, ufids, position_type and
+        position_description
+     -- Add add_person
+     -- Add former_person to remove assertions for people who have left the
+        university
+     -- Add current_person to assert UFEntity and UFCurrentEntity for people
+        who are currently employed
+     -- Add sampling of case processing for testing purposes
+     -- Added add_position for case 1
+     Version 0.2 MC 2013-06-18
+     -- Reads five files -- privacy, HR, contact, deptid exceptions, ufid
+        exceptions.  Writes four files -- log, exception list, addition RDF and
+        subtraction RDF
+     -- Adds contact info for people being created
+     -- For case 2 update position end date for people who have left
+     -- For case 3, update the contact info including home department
+     -- For case 3, update position info, including adding position if necessary
+     Version 0.3 MC 2013-07-24
+     -- Correct errors in ontology names
+     -- Improve datetime handling
+     -- Improve filtering of source data for start and end dates
+     -- Improve phone number handling
+     -- XML escape all output to RDF
+     Version 0.4 MC 2013-08-05
+     -- Catch deptid exception for update_position
+     -- merged with forked version that fixed resource type assertions
+     Version 0.5 cpb@ufl.edu 2013-08-05
+     -- merged with forked version form succes run that fixed resource type
+        assertions
+     -- fixed core and other resource namespace issues
+     Version 0.6 MC 2013-08-07
+     -- Fix classification error for Case 1/2 determination
+     -- Read new format for privacy_data
+     Version 0.7 MC 2013-08-11
+     -- ok_privacy writes exceptions to exception file and returns False
+        rather than throwing an exception
+     -- Read privacy data as a CSV
+     -- map contact data elements from UF names to VIVO names
+     -- improvements in position and working titles
+     -- improvements in wording of exception output
+     Version 0.8 MC 2013-08-26
+     -- Only edit the UF working title if it is all upper case
+     -- Add a space after the comma in the display name if needed
+     -- Handle additional abbreviations in position and working titles
+     -- Case 2 now removes preferred titles correctly
+     -- Improve run time by improving contact data only if we are going
+        to use it.  So we improve 40,000 instead of 2M
+     -- Improve run time by using action report to reduce the size of privacy
+        and contact dictionaries
+     -- Fix bug in add regarding start dates
+     -- For case 1, show the person URI in the log when added
+     -- Improved indenting in RDF for add person
+     -- For case 3, check for qualified positions before adding them
+     -- Handle multiple commas in positiona and working titles
+     -- Fix bug that wrote position_uri to sub.rdf
+     -- Review and improve exception handling
+     -- Improvements in log formatting
+     -- Fix bug in recognizing that a person already has a valid home department
+     Version 0.9 MC 2013-09-04
+     -- Improvements in EXC file formatting
+     -- Improvements in LOG file formatting
+     -- Every print statement now explictly routed to one of the output files
+     -- Version numbers of person-ingest and vivotools now printed in the log
+     -- UFIDs now processed in order -- aids in reading logs and restarts
+     -- Fix bug in case 1 counting
+     -- Fix bug in update_contact for preferred_title
+     -- Fixed bugs in escaping output
+     Version 0.91 MC 2013-09-08
+     -- Add URI exception list for people with UFID, but who are not on the UF
+        pay list.  Anyone on the URI exception list will not be processed at
+        all. They are, in effect, manual edit only.  Because they have a UFID,
+        they will accumulate other facts -- grants, courses.  If they are
+        manually edited to include UFEntity, they will have papers added as
+        well.
+     -- Remove all references to homeDeptFor.  This will be added by the
+        inferencer as an inverse property to homeDept
+     Version 0.92 MC 2013-09-08
+     -- URI Exception list handling added to case 3
+     Version 0.93 MC 2013-10-03
+     -- Added foaf:Person assertion to add_person
+     Version 0.94 MC 2013-10-05
+     -- Check for ok_position to see if position should be added (case 1 and
+        case 3).  We only add HR positions, not the "positions" from course
+        ingest (HR_POSITION=0) which are used to add new people.  We do not
+        add positions to excluded departments.
+    Version 0.95 MC 2013-10-17
+     -- Add Ops Lump Sum Payment to list of excluded position titles
+    Version 0.96 MC 2013-12-11
+     -- Correct support for adding people without positions
+    Version 0.97 MC 2013-12-16
+     -- Support adding people without home departments
+    Version 0.98 MC 2014-02-24
+    --  Fix email addresses on the way in
+
+    Future enhancements:
+     -- For case 2, close end dates for positions with explicit HR data rather
+        than inferring an end date via the absence of HR data
+     -- read external sources into standard tag name structures.  Do not carry
+        local names (JOBCODE_DESCRIPTION) into the code.
+     -- explore data source and process for assigning person type Librarian. UF
+        marks librarians as Faculty in HR data.  No indication that the person
+        is a librarian by salary plan

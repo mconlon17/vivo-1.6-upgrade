@@ -19,11 +19,8 @@
     Current, the current HR position will be updated or added as needed.
 
     To Do:
-    Add additional checks regarding inclusion/exclusion criteria
-    Test cases for all inclusion/exclusion
-    Add UF Ontology to vagrant
-    Begin output processes
-    Handle case 2 (separate program)
+    Just about everything
+    Handle case 2 (separate program!?)
 
     Future enhancements:
      -- For case 2, close end dates for positions with explicit HR data rather
@@ -47,90 +44,27 @@ from vivofoundation import find_vivo_uri
 from vivofoundation import get_vivo_uri
 from vivofoundation import read_csv
 from vivopeople import get_person
-from vivopeople import get_position_type
-from vivopeople import improve_jobcode_description
-from vivopeople import repair_phone_number
-from vivopeople import repair_email
 from operator import itemgetter
 import codecs
 import sys
 import os
 import vivofoundation as vf
 
-def comma_space(s):
-    """
-    insert a space after every comma in s unless s ends in a comma
-    """
-    k = s.find(',')
-    if k > -1 and k < len(s)-1 and s[k+1] != " ":
-        s = s[0:k] + ', ' + comma_space(s[k+1:])
-    return s
-
 # Prepare, add, update
 
 def prepare_people(position_file_name):
     """
     Given a UF position file, return a list of people to be added to VIVO.
-    Process each data value.  Reject bad values.  Return clean data ready
-    to add. If more than one position qualifies for inclusion, use the last
-    one in the file.
-
-    Requires a shelve privacy keyed by UFID containing privacy flags
+    Process each data value.  Reject bad values.  Reject things that must
+    be found in VIVO.  Return clean data ready to add. If more than one
+    position qualifies for inclusion, use the last one in the file.
     """
-    import shelve
-    privacy = shelve.open('privacy')
-    contact = shelve.open('contact')
     people = {}
     positions = read_csv(position_file_name)
     for row, position in sorted(positions.items(), key=itemgetter(1)):
-        person = {}
-        ufid = str(position['UFID'])
-        person['uri'] = find_vivo_uri('ufVivo:ufid', ufid)
-        person['deptid'] = position['DEPTID']
-        person['ufid'] = position['UFID']
-        person['type'] = get_position_type(position['SAL_ADMIN_PLAN'])
-        if person['type'] is None:
-            exc_file.write(ufid+' invalid salary plan '+\
-                           position['SAL_ADMIN_PLAN']+'\n')
-            continue
-        if ufid not in privacy:
-            exc_file.write(ufid+' not found in privacy data\n')
-            continue
-        flags = privacy[ufid]
-        if flags['UF_PROTECT_FLG'] == 'Y':
-            exc_file.write(ufid+' has protect flag Y\n')
-            continue
-        if flags['UF_SECURITY_FLG'] == 'Y':
-            exc_file.write(ufid+' has security flag Y\n')
-            continue
-        if ufid not in contact:
-            exc_file.write(ufid+' not found in contact data\n')
-            continue
-        info = contact[ufid]
-        person['first_name'] = info['FIRST_NAME'].title()
-        person['last_name'] = info['LAST_NAME'].title()
-        person['middle_name'] = info['MIDDLE_NAME'].title()
-        person['name_suffix'] = info['NAME_SUFFIX'].title()
-        person['name_prefix'] = info['NAME_PREFIX'].title()
-        person['display_name'] = comma_space(info['DISPLAY_NAME'].title())
-        person['gatorlink'] = info['GATORLINK'].lower()
-        if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
-            person['preferred_title'] = \
-                improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
-        else:
-            person['preferred_title'] = info['WORKINGTITLE']
-        person['primary_email'] = repair_email(info['UF_BUSINESS_EMAIL'])
-        person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
-        person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
-        person['deptid'] = info['HOME_DEPT']
-        person['start_date'] = position['START_DATE']
-        person['end_date'] = position['END_DATE']
-        person['description'] = \
-            improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
-        person['hr_position'] = position['HR_POSITION'] == "1"
-        people[ufid] = person
-    privacy.close()
-    contact.close()
+        ufid = position['UFID']
+        position['uri'] = find_vivo_uri('ufVivo:ufid', ufid)
+        people[ufid] = position
     return people
 
 def add_person(person):
@@ -192,10 +126,10 @@ for source_person in people.values():
     
     if 'uri' in source_person and source_person['uri'] is not None:
         print >>log_file, "Updating person at", source_person['uri']
-##        vivo_person = get_person(source_person['uri'])
-##        [add, sub] = update_person(vivo_person, source_person)
-##        ardf = ardf + add
-##        srdf = srdf + sub
+        vivo_person = get_person(source_person['uri'])
+        [add, sub] = update_person(vivo_person, source_person)
+        ardf = ardf + add
+        srdf = srdf + sub
     else:
         print >>log_file, "Adding person at", source_person['uri']
         [add, person_uri] = add_person(source_person)
@@ -211,5 +145,4 @@ add_file.write(adrf)
 sub_file.write(srdf)
 add_file.close()
 sub_file.close()
-exc_file.close()
 print >>log_file, datetime.now(), "Finished"
