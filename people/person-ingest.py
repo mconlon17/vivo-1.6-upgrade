@@ -19,7 +19,7 @@
     Current, the current HR position will be updated or added as needed.
 
     To Do:
-    Add additional checks regarding inclusion/exclusion criteria
+    Add ufid, uri and piosition title exceptions (sheesh!)
     Test cases for all inclusion/exclusion
     Add UF Ontology to vagrant
     Begin output processes
@@ -66,6 +66,26 @@ def comma_space(s):
         s = s[0:k] + ', ' + comma_space(s[k+1:])
     return s
 
+def ok_deptid(deptid, deptid_exceptions):
+    """
+    Some deptids are in an exception dictionary of patterns.  If a person is
+    in one of these departments, they will not be listed in VIVO.
+
+    Deptids in the exception dictionary are regular expressions
+
+    Given a dept id, the deptid exception list is checked.  True is
+    returned if the deptid is not matched.  False is returned
+    if the deptid is matched.
+    """
+    import re
+    ok = True
+    for pattern_string in deptid_exceptions.keys():
+        pattern = re.compile(pattern_string)
+        if pattern.search(deptid) is not None:
+            ok = False
+            break
+    return ok
+
 # Prepare, add, update
 
 def prepare_people(position_file_name):
@@ -75,18 +95,28 @@ def prepare_people(position_file_name):
     to add. If more than one position qualifies for inclusion, use the last
     one in the file.
 
-    Requires a shelve privacy keyed by UFID containing privacy flags
+    Requires
+    -- a shelve privacy keyed by UFID containing privacy flags
+    -- a shelve off contact data keyed by UFID
+    -- a shelve of deptid exception patterns
     """
     import shelve
     privacy = shelve.open('privacy')
     contact = shelve.open('contact')
+    deptid_exceptions = shelve.open('deptid_exceptions')
     people = {}
     positions = read_csv(position_file_name)
     for row, position in sorted(positions.items(), key=itemgetter(1)):
         person = {}
         ufid = str(position['UFID'])
         person['uri'] = find_vivo_uri('ufVivo:ufid', ufid)
-        person['deptid'] = position['DEPTID']
+        if ok_deptid(position['DEPTID'], deptid_exceptions):
+            person['position_deptid'] = position['DEPTID']
+        else:
+            exc_file.write(ufid+' has position in department '+\
+                position['DEPTID']+' which is on the department exception '+
+                ' list.  No position will be added.\n')
+            person['position_deptid'] = None
         person['ufid'] = position['UFID']
         person['type'] = get_position_type(position['SAL_ADMIN_PLAN'])
         if person['type'] is None:
@@ -122,7 +152,12 @@ def prepare_people(position_file_name):
         person['primary_email'] = repair_email(info['UF_BUSINESS_EMAIL'])
         person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
         person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
-        person['deptid'] = info['HOME_DEPT']
+        if ok_deptid(info['HOME_DEPT'], deptid_exceptions):
+            person['home_deptid'] = info['HOME_DEPT']
+        else:
+            exc_file.write(ufid+' has home department on exception list.'+\
+                ' This person will not be added to VIVO.\n')
+            continue
         person['start_date'] = position['START_DATE']
         person['end_date'] = position['END_DATE']
         person['description'] = \
@@ -131,6 +166,7 @@ def prepare_people(position_file_name):
         people[ufid] = person
     privacy.close()
     contact.close()
+    deptid_exceptions.close()
     return people
 
 def add_person(person):
@@ -199,7 +235,7 @@ for source_person in people.values():
     else:
         print >>log_file, "Adding person at", source_person['uri']
         [add, person_uri] = add_person(source_person)
-        vivo_person = {'uri': source_person['uri']}
+        vivo_person = {'uri': person_uri}
         ardf = ardf + add
         [add, sub] = update_person(vivo_person, source_person)
         ardf = ardf + add

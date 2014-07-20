@@ -22,16 +22,12 @@ import os
 #   Start here
 
 print datetime.now(), "Start"
-
 contact_data = read_csv('contact_data.txt')
-
 try:
     os.remove('contact')
 except:
     pass
-
 contact =shelve.open('contact')
-
 k = 0
 for row,val in contact_data.items():
     k = k + 1
@@ -39,5 +35,37 @@ for row,val in contact_data.items():
         print k
     contact[str(val['UFID'])] = val
 contact.close()
+
+# Deptid_exceptions
+
+deptid_exceptions_data = read_csv('deptid_exceptions_data.txt')
+try:
+    os.remove('deptid_exceptions')
+except:
+    pass
+deptid_exceptions =shelve.open('deptid_exceptions')
+k = 0
+for row,val in deptid_exceptions_data.items():
+    k = k + 1
+    if k % 1000 == 0:
+        print k
+    deptid_exceptions[str(val['deptid_pattern'])] = val
+deptid_exceptions.close()
+
+# Privacy
+
+privacy_data = read_csv('privacy_data.txt')
+try:
+    os.remove('privacy')
+except:
+    pass
+privacy =shelve.open('privacy')
+k = 0
+for row,val in privacy_data.items():
+    k = k + 1
+    if k % 1000 == 0:
+        print k
+    privacy[str(val['UFID'])] = val
+privacy.close()
 
 print datetime.now(), "End"
