@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF 
+		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+		xmlns:afn="http://jena.hpl.hp.com/ARQ/function#" 
+		xmlns:bibo="http://purl.org/ontology/bibo/" 
+		xmlns:c4o="http://purl.org/spar/c4o/" 
+		xmlns:dcelem="http://purl.org/dc/elements/1.1/" 
+		xmlns:dcterms="http://purl.org/dc/terms/" 
+		xmlns:ero="http://purl.obolibrary.org/obo/" 
+		xmlns:event="http://purl.org/NET/c4dm/event.owl#" 
+		xmlns:fabio="http://purl.org/spar/fabio/" 
+		xmlns:foaf="http://xmlns.com/foaf/0.1/" 
+		xmlns:geo="http://aims.fao.org/aos/geopolitical.owl#" 
+		xmlns:j.0="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" 
+		xmlns:owl="http://www.w3.org/2002/07/owl#" 
+		xmlns:owl2="http://www.w3.org/2006/12/owl2-xml#" 
+		xmlns:pvs="http://vivoweb.org/ontology/provenance-support#" 
+		xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+		xmlns:scires="http://vivoweb.org/ontology/scientific-research#" 
+		xmlns:scirr="http://vivoweb.org/ontology/scientific-research-resource#" 
+		xmlns:skos="http://www.w3.org/2004/02/skos/core#" 
+		xmlns:swvs="http://www.w3.org/2003/06/sw-vocab-status/ns#" 
+		xmlns:ufv="http://vivo.ufl.edu/ontology/vivo-ufl/" 
+		xmlns:vann="http://purl.org/vocab/vann/" 
+		xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/public#" 
+		xmlns:vivo="http://vivoweb.org/ontology/core#" 
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    <owl:Ontology rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/">
+        <j.0:ontologyPrefixAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ufv</j.0:ontologyPrefixAnnot>
+        <rdfs:label xml:lang="en-US">UF VIVO Ontology Extensions</rdfs:label>
+    </owl:Ontology>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/StudentAssistantPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Position held by a student assistant as defined by UF payroll data.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">Student Assistant Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position held by a student assistant.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/PostDocPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position held by a person in a postdoctoral appointment.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">Post Doc Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Position for a post doctoral person.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/MiscFaculty">
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:label xml:lang="en-US">Misc Faculty</rdfs:label>
+        <owl:equivalentClass rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/MiscFaculty" />
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Agent" />
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#curator" />
+        <rdfs:subClassOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Used to filter display on index pages. Must be selected as institutional internal class.</j.0:descriptionAnnot>
+        <j.0:isMenuPageIntersectionClass>true</j.0:isMenuPageIntersectionClass>
+        <rdfs:label xml:lang="en-US">UF Entity</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Container class for University of Florida local entities (people, organizations, etc.)</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupcourses" />
+        <rdfs:label xml:lang="en-US">Course Section</rdfs:label>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The individual offering of a course, taught in a specific semester by a specific professor.</j.0:shortDef>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://purl.org/NET/c4dm/event.owl#Event" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/Course">
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An abstract instance of a course. Use CourseSection for actual courses taught at a particular time.</j.0:shortDef>
+        <rdfs:subClassOf rdf:resource="http://purl.org/NET/c4dm/event.owl#Event" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupcourses" />
+        <rdfs:label xml:lang="en-US">Course</rdfs:label>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/TemporaryFacultyPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position held by a person in a temporary faculty appointment.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="fr-FR">Temporary Faculty Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position held by a person in a temporary faculty appointment.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/Consultant">
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:label xml:lang="en-US">Consultant</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A person from outside the university paid on a contract basis for a limited-term job.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/Deceased">
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">People who are no longer alive.</j.0:shortDef>
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A container class for people who are no longer alive.</j.0:descriptionAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdfs:label xml:lang="en-US">Deceased</rdfs:label>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource">
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A resource held by an institution available for use in research. This includes items such as electron microscopes, computer servers, etc. Described in a description that can be used in grant text and assigned a person who is responsible for maintaining the resource's record.</j.0:descriptionAnnot>
+        <rdfs:label xml:lang="en-US">Research Resource</rdfs:label>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A resource useful for doing research. Used in grant preparation.</j.0:shortDef>
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An electron microscope.</j.0:exampleAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppublications" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/ExtensionDocument">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subClassOf rdf:resource="http://purl.org/ontology/bibo/Article" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#InformationResource" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://purl.org/ontology/bibo/Document" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <owl:equivalentClass rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ExtensionDocument" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An IFAS Extension Document</j.0:shortDef>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="en-US">Extension Document</rdfs:label>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppublications" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/CTSIInvestigatorRole">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#ResearcherRole" />
+        <rdfs:label xml:lang="en-US">CTSI Investigator Role</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Role for a person who performs clinical and translational science. Linked to an associated CTSI via roleContributesTo.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/CourtesyFacultyPosition">
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#DependentResource" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:subClassOf rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:label xml:lang="en-US">Courtesy Faculty Position</rdfs:label>
+        <owl:equivalentClass rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourtesyFacultyPosition" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/HousestaffPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Position for a degreed person  who practices medicine in a hopsital under supervision of fully licensed physicians.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="fr-FR">Housestaff Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Position for a degreed person  who practices medicine in a hopsital under supervision of fully licensed physicians.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/InternationalAgreement">
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="en-US">International Agreement</rdfs:label>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGroupactivities" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Agreement" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A cooperative agreement between a University of Florida department and a department in another university. Oversight is by UF's International Center.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/Housestaff">
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A degreed person who practices medicine in a hopsital under supervision of fully licensed physicians.</j.0:shortDef>
+        <rdfs:label xml:lang="fr-FR">Housestaff</rdfs:label>
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A degreed person who practices medicine in a hopsital under supervision of fully licensed physicians. Sometimes called a "resident".</j.0:descriptionAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/InternationalProgramLocalContactRole">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Role" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">International Program Local Contact Role</rdfs:label>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/ClinicalFacultyPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#FacultyPosition" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position held by a faculty member who also engages in practical clinical instruction of students.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">Clinical Faculty Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A position for a clinical faculty member.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/TemporaryFaculty">
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#FacultyMember" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="fr-FR">Temporary Faculty</rdfs:label>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A faculty member who does not have a permanent position.</j.0:shortDef>
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Temporary Faculty is a designation given by UF to people who do not have permanent positions. These people participate in the research and scholarly life of the university -- teaching courses, writing papers, seeing patients. They are not subject to the typical UF staff and faculty protections and typically do not have benefits.</j.0:descriptionAnnot>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/GraduateAssistantPosition">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Position" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An assistant position held by a graduate student.</j.0:descriptionAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">Graduate Assistant Position</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An assistant position held by a graduate student.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/FullTextURL">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#URLLink" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A link to the full text (PDF or other format) of a published paper.</j.0:descriptionAnnot>
+        <rdfs:label xml:lang="en-US">Full Text URL</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A link to the full text (PDF or other format) of a published paper.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/ClinicalFaculty">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#FacultyMember" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A faculty member that primarily provides practical instruction in a medical setting.</j.0:descriptionAnnot>
+        <rdfs:label xml:lang="en-US">Clinical Faculty</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Faculty member who instructs clinical students.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/NonGovernmentalOrganization">
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Definition taken from WikiPedia: http://en.wikipedia.org/wiki/ .  Non-governmental_organization&#xD;
+A non-governmental organization (NGO) is a legally constituted organization created by natural or legal persons that operates independently from any government. In the cases in which NGOs are funded totally or partially by governments, the NGO maintains its non-governmental status by excluding government representatives from membership in the organization. The term is usually applied only to organizations that pursue some wider social aim that has political aspects, but that are not overtly political organizations such as political parties. Unlike the term "intergovernmental organization", the term "non-governmental organization" has no generally agreed legal definition. In many jurisdictions, these types of organization are called "civil society organizations" or referred to by other names.</j.0:descriptionAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A non-governmental organization (NGO) is a legally constituted organization created by natural or legal persons that operates independently from any government.</j.0:shortDef>
+        <owl:equivalentClass rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/NonGovernmentalOrganization" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Agent" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouporganizations" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:label xml:lang="en-US">Non-Governmental Organization</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/AdministrativeUnit">
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouporganizations" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An administrative entity which may not have a single physical location.</j.0:shortDef>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayLimitAnnot>
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:label xml:lang="en-US">Administrative Unit</rdfs:label>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/UFCurrentEntity">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#curator" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#curator" />
+        <rdfs:subClassOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Used to indicate a person, organization or other entity is currently employed or otherwise associated with the University of Florida.</j.0:descriptionAnnot>
+        <rdfs:label xml:lang="en-US">UF Current Entity</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Used to indicate a person, organization or other entity is currently employed or otherwise associated with the University of Florida.</j.0:shortDef>
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/CourtesyFaculty">
+        <owl:equivalentClass rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourtesyFaculty" />
+        <j.0:inClassGroup rdf:resource="http://vivoweb.org/ontology#vitroClassGrouppeople" />
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">10</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="en-US">Courtesy Faculty</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A temporary or long-term position, normally from the outside of UF, and is unpaid.</j.0:shortDef>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Agent" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">-1</j.0:displayRankAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+    </owl:Class>
+    <owl:Class rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/VIVOOptIn">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#curator" />
+        <rdfs:subClassOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/VIVOOptIn" />
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicates the person has chosen to be in UF VIVO.  Used by business processes to confirm that a person not otherwise expected to be in UF VIVO, should be in UF VIVO.  Used only for exception cases.</j.0:descriptionAnnot>
+        <j.0:isMenuPageIntersectionClass>true</j.0:isMenuPageIntersectionClass>
+        <rdfs:label xml:lang="en-US">VIVO Opt In</rdfs:label>
+        <j.0:shortDef rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Container class for people who have opted in to UF VIVO</j.0:shortDef>
+    </owl:Class>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/hasContactPerson">
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupresearch" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The person responsible for maintaining the record for the research resource. Contact data appears on their VIVO profile.</j.0:publicDescriptionAnnot>
+        <rdfs:range rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity" />
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource" />
+        <rdfs:label xml:lang="en-US">has contact person</rdfs:label>
+        <owl:inverseOf>
+            <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/contactPersonFor" />
+        </owl:inverseOf>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/dateTimeIntervalFor">
+        <owl:inverseOf rdf:resource="http://vivoweb.org/ontology/core#dateTimeInterval" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGrouptime" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/dateTimeIntervalFor" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#DateTimeInterval" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">date/time interval for</rdfs:label>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/sectionForCourse">
+        <rdfs:range rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/Course" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:fullPropertyNameAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">section for course</j.0:fullPropertyNameAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupteaching" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a Course Section to the abstract Course that it is an instance of.</j.0:descriptionAnnot>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">20</j.0:displayRankAnnot>
+        <rdfs:label xml:lang="en-US">section for course</rdfs:label>
+        <owl:inverseOf>
+            <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/courseForSection" />
+        </owl:inverseOf>
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a Course Section to the abstract Course that it is an instance of.</j.0:publicDescriptionAnnot>
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/hasResearchResource">
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="en-US">has research resource</rdfs:label>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <owl:inverseOf>
+            <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/researchResourceFor" />
+        </owl:inverseOf>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupresearch" />
+        <rdfs:range rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Relates an entity (person, department, school, etc.) to a research resource that they have possession or authority over.</j.0:publicDescriptionAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Agent" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/lastUpdatedDate">
+        <rdfs:label xml:lang="en-US">last updated date</rdfs:label>
+        <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue" />
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The date that a research resource's description was last updated.</j.0:publicDescriptionAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupresearch" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/contactPersonFor">
+        <rdfs:label xml:lang="en-US">contact person for</rdfs:label>
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a person to the research resource that they are responsible for.</j.0:publicDescriptionAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupresearch" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <rdfs:range rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/hasContactPerson" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/collectionWithin">
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#partOf" />
+        <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Library" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupadministration" />
+        <rdfs:label xml:lang="en-US">collection within</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <owl:inverseOf>
+            <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/hasCollection" />
+        </owl:inverseOf>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Library" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">19</j.0:displayRankAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:offerCreateNewOptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:offerCreateNewOptionAnnot>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/collectionWithin" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/hasCourseRole">
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupoverview" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#hasRole" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:label xml:lang="en-US">has course role</rdfs:label>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:fullPropertyNameAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">personCourseLink</j.0:fullPropertyNameAnnot>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#TeacherRole" />
+        <owl:inverseOf>
+            <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/courseRoleOf" />
+        </owl:inverseOf>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">20</j.0:displayRankAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/researchResourceFor">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/hasResearchResource" />
+        <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Agent" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ResearchResource" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Relates a research resource to the entity (department, person, school, etc.) that has possession or authority over the resource.</j.0:publicDescriptionAnnot>
+        <rdfs:label xml:lang="en-US">research resource for</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupresearch" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/hasCollection">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/collectionWithin" />
+        <rdfs:range rdf:resource="http://vivoweb.org/ontology/core#Library" />
+        <rdfs:label xml:lang="en-US">collections</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/hasCollection" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#hasPart" />
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Library" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">19</j.0:displayRankAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/courseForSection">
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <rdfs:label xml:lang="en-US">course for section</rdfs:label>
+        <rdfs:range rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links an abstract Course to the individual instances.</j.0:descriptionAnnot>
+        <j.0:fullPropertyNameAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">course for section</j.0:fullPropertyNameAnnot>
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">20</j.0:displayRankAnnot>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/Course" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupteaching" />
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/sectionForCourse" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links an abstract Course to the individual instances.</j.0:publicDescriptionAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/homeDeptFor">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <owl:inverseOf>
+            <owl:InverseFunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/homeDept" />
+        </owl:inverseOf>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <rdfs:label xml:lang="en-US">home department for</rdfs:label>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/courseRoleOf">
+        <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:displayRankAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">20</j.0:displayRankAnnot>
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/hasCourseRole" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty" />
+        <j.0:fullPropertyNameAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">courseLinkPerson</j.0:fullPropertyNameAnnot>
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#TeacherRole" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupoverview" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#roleOf" />
+        <rdfs:label xml:lang="en-US">course role of</rdfs:label>
+    </owl:ObjectProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/dateHarvested">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string" />
+        <rdfs:domain rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/dateHarvested" />
+        <rdfs:label xml:lang="en-US">date harvested</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/psProjectNumber">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/psProjectNumber" />
+        <rdfs:label xml:lang="en-US">PeopleSoft Project Number</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/grantCited">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Citation text for grants, usually NIH.</j.0:exampleAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:domain rdf:resource="http://purl.org/ontology/bibo/AcademicArticle" />
+        <rdfs:label xml:lang="en-US">grantCited</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/psContractNumber">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/psContractNumber" />
+        <rdfs:label xml:lang="en-US">PeopleSoft Contract Number</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/buildingNumber">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A four digit number assigned by UF's Planning, Design and Construction Division for each UF building. Serves as a unique identifier for that building.</j.0:publicDescriptionAnnot>
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0132</j.0:exampleAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGrouplocation" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A four digit number assigned by UF's Planning, Design and Construction Division for each UF building. Serves as a unique identifier for that building.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Building" />
+        <rdfs:label xml:lang="en-US">Building Number</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/sponsorID">
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Internal number identifying grant-awarding institution. Generated by DSR data.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <rdfs:label xml:lang="en-US">sponsorID</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/sponsorID" />
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/dsrNumber">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Internal Number for DSR for all projects and contracts</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://vivoweb.org/ontology/core#Grant" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/dsrNumber" />
+        <rdfs:label xml:lang="en-US">DSR Number</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/sectionNum">
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The number for a Course Section.</j.0:descriptionAnnot>
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0553</j.0:exampleAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor" />
+        <rdfs:label xml:lang="en-US">section number</rdfs:label>
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/sectionNum" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0553</j.0:exampleAnnot>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/thomsonReutersUT">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Thomson Reuters' unique identifier for articles in Web of Science.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://purl.org/ontology/bibo/Article" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <rdfs:label xml:lang="en-US">Thomson Reuters UT</rdfs:label>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/deptID">
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Department ID is the lowest budgetary unit or responsibility center from peoplesoft at UF.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">55110101</j.0:exampleAnnot>
+        <rdfs:label xml:lang="en-US">UF Department ID</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/deptID" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/isni">
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The International Standard Name Identifier (ISO 27729), ISNI, is a proposed standard for numbering organizations. ORCID, for numbering scholars, is a subset of the ISNI numbering scheme.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0000 0001 2193 2008</j.0:exampleAnnot>
+        <rdfs:label xml:lang="en-US">ISNI (ISO 27729)</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/deptID" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/irbnumber">
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The IRB Number is used by the UF IRBs to uniquely identify human subject research studies at the University of Florida.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://purl.obolibrary.org/obo/ERO_0000015" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1999H145</j.0:exampleAnnot>
+        <rdfs:label xml:lang="en-US">IRB Number</rdfs:label>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:DatatypeProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/privacyFlag">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Florida privacy flag. Setting is either Y or N. Blank value is considered an error.</j.0:publicDescriptionAnnot>
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Y</j.0:exampleAnnot>
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">University of Florida privacy flag. Setting is either Y or N. Blank value is considered an error.</j.0:descriptionAnnot>
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <rdfs:label xml:lang="en-US">privacy flag</rdfs:label>
+    </owl:FunctionalProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/courseNum">
+        <rdfs:label xml:lang="en-US">course number</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The identifier (CRS) for a course.</j.0:descriptionAnnot>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/courseNum" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">BSC 1920</j.0:exampleAnnot>
+        <rdfs:domain rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/Course" />
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+    </owl:FunctionalProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/sjr">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A ranking from Scopus/SCImago that shows journals as they are ranked in the Scopus database using Google's PageRank algorithm.</j.0:publicDescriptionAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupbibliographic" />
+        <rdfs:domain rdf:resource="http://purl.org/ontology/bibo/Journal" />
+        <rdfs:label xml:lang="en-US">SCImago Journal &amp; Country Rank</rdfs:label>
+    </owl:FunctionalProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/harvestedBy">
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#editor" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string" />
+        <rdfs:domain rdf:resource="http://www.w3.org/2002/07/owl#Thing" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/harvestedBy" />
+        <rdfs:label xml:lang="en-US">harvested from</rdfs:label>
+    </owl:FunctionalProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/ufid">
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">UFID is the main identifier for individuals associated with the University of Florida.  This unique digit codes links a user across a variety of databases and associations.</j.0:descriptionAnnot>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor" />
+        <rdfs:label xml:lang="en-US">UFID</rdfs:label>
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/ufid" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">01234567</j.0:exampleAnnot>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+    </owl:FunctionalProperty>
+    <owl:FunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor" />
+        <j.0:descriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gatorlink is the computer signon for the University of Florida, it is also the one email address for any person at UF.</j.0:descriptionAnnot>
+        <rdfs:label xml:lang="en-US">Gatorlink Username</rdfs:label>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupidentifiers" />
+        <rdfs:subPropertyOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink" />
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty" />
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <rdfs:subPropertyOf rdf:resource="http://vivoweb.org/ontology/core#identifier" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:exampleAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">gatorfan part of email address gatorfan@ufl.edu</j.0:exampleAnnot>
+    </owl:FunctionalProperty>
+    <owl:InverseFunctionalProperty rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/homeDept">
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+        <j.0:publicDescriptionAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#string">home department as specified by PeopleSoft.</j.0:publicDescriptionAnnot>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty" />
+        <rdfs:domain rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin" />
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <owl:inverseOf rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/homeDeptFor" />
+        <rdfs:range rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <rdfs:label xml:lang="en-US">home department</rdfs:label>
+        <j.0:inPropertyGroupAnnot rdf:resource="http://vivoweb.org/ontology#vitroPropertyGroupaffiliation" />
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty" />
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+    </owl:InverseFunctionalProperty>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/ontology/vivo-ufl/eventVenueFor">
+        <j.0:selectFromExistingAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:selectFromExistingAnnot>
+        <j.0:hiddenFromDisplayBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:prohibitedFromUpdateBelowRoleLevelAnnot rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/role#public" />
+        <j.0:displayLimitAnnot rdf:datatype="http://www.w3.org/2001/XMLSchema#int">5</j.0:displayLimitAnnot>
+    </rdf:Description>
+</rdf:RDF>
