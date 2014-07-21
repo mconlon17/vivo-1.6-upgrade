@@ -4,29 +4,31 @@
 
     Version 0.1 MC 2013-12-28
     --  Initial version.
+    Version 0.2 MC 2014-07-21
+    --  Upgraded for vivotools 2.0
 
 """
 
-__author__      = "Michael Conlon"
-__copyright__   = "Copyright 2013, University of Florida"
-__license__     = "BSD 3-Clause license"
-__version__     = "0.1"
+__author__ = "Michael Conlon"
+__copyright__ = "Copyright 2014, University of Florida"
+__license__ = "BSD 3-Clause license"
+__version__ = "0.2"
 
-import vivotools as vt
+from vivofoundation import vivo_sparql_query
 import json
 from datetime import datetime
 
-print datetime.now(),"Start"
+print datetime.now(), "Start"
 
 query = """
     SELECT ?p ?o
     WHERE {
-      <http://vivo.ufl.edu/individual/n25562> ?p ?o
+      <http://vivo.ufl.edu/individual/n3715> ?p ?o
     }
     ORDER BY ?p
     """
 
-data=vt.vivo_sparql_query(query,debug=True) # show the encoded query                                # issue the query, return the data
+data = vivo_sparql_query(query, debug=True) # show the encoded query                                # issue the query, return the data
 print "Retrieved data:\n" + json.dumps(data, sort_keys=True, indent=4)
-print "Items found = ",len(data["results"]["bindings"])
-print datetime.now(),"Finish"
+print "Items found = ", len(data["results"]["bindings"])
+print datetime.now(), "Finish"

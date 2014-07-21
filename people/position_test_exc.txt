@@ -1,1 +1,7 @@
+84808900 invalid salary plan 
+84808900 has position in department 73001000 which is on the department exception  list.  No position will be added.
+89616918 has home department on exception list. This person will not be added to VIVO.
 80100558 invalid salary plan OPSN
+55667788 not found in privacy data
+11223344 not found in privacy data
+99999628 in ufid_exceptions.  Will be skipped.

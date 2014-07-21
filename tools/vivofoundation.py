@@ -11,6 +11,9 @@ __version__ = "2.00"
 
 concept_dictionary = {}
 
+VIVO_URI_PREFIX = "http://vivo.ufl.edu/individual/"
+VIVO_QUERY_URI = "http://localhost:8000/VIVO/sparql" # For vagrant development
+
 import urllib, urllib2, json, random
 import string
 from datetime import datetime, date
@@ -811,36 +814,36 @@ def rdf_header():
     """
     rdf_header = """<?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
-    xmlns:rdf     = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:rdfs    = "http://www.w3.org/2000/01/rdf-schema#"
-    xmlns:xsd     = "http://www.w3.org/2001/XMLSchema#"
-    xmlns:owl     = "http://www.w3.org/2002/07/owl#"
-    xmlns:swrl    = "http://www.w3.org/2003/11/swrl#"
-    xmlns:swrlb   = "http://www.w3.org/2003/11/swrlb#"
-    xmlns:vitro1  = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
-    xmlns:bibo    = "http://purl.org/ontology/bibo/"
-    xmlns:c4o     = "http://purl.org/spar/c4o/"
-    xmlns:dcelem  = "http://purl.org/dc/elements/1.1/"
-    xmlns:dcterms = "http://purl.org/dc/terms/"
-    xmlns:event   = "http://purl.org/NET/c4dm/event.owl#"
-    xmlns:foaf    = "http://xmlns.com/foaf/0.1/"
-    xmlns:fabio   = "http://purl.org/spar/fabio/"
-    xmlns:geo     = "http://aims.fao.org/aos/geopolitical.owl#"
-    xmlns:pvs     = "http://vivoweb.org/ontology/provenance-support#"
-    xmlns:ero     = "http://purl.obolibrary.org/obo/"
-    xmlns:scires  = "http://vivoweb.org/ontology/scientific-research#"
-    xmlns:skos    = "http://www.w3.org/2004/02/skos/core#"
-    xmlns:ufVivo  = "http://vivo.ufl.edu/ontology/vivo-ufl/"
-    xmlns:vitro2  = "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
-    xmlns:core    = "http://vivoweb.org/ontology/core#"
-    xmlns:vivo    = "http://vivoweb.org/ontology/core#">
+    xmlns:rdf    = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+    xmlns:rdfs   = "<http://www.w3.org/2000/01/rdf-schema#>"
+    xmlns:xsd    = "<http://www.w3.org/2001/XMLSchema#>"
+    xmlns:owl    = "<http://www.w3.org/2002/07/owl#>"
+    xmlns:swrl   = "<http://www.w3.org/2003/11/swrl#>"
+    xmlns:swrlb  = "<http://www.w3.org/2003/11/swrlb#>"
+    xmlns:vitro  = "<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>"
+    xmlns:bibo   = "<http://purl.org/ontology/bibo/>"
+    xmlns:c4o    = "<http://purl.org/spar/c4o/>"
+    xmlns:cito   = "<http://purl.org/spar/cito/>"
+    xmlns:event  = "<http://purl.org/NET/c4dm/event.owl#>"
+    xmlns:fabio  = "<http://purl.org/spar/fabio/>"
+    xmlns:foaf   = "<http://xmlns.com/foaf/0.1/>"
+    xmlns:geo    = "<http://aims.fao.org/aos/geopolitical.owl#>"
+    xmlns:obo    = "<http://purl.obolibrary.org/obo/>"
+    xmlns:ocrer  = "<http://purl.org/net/OCRe/research.owl#>"
+    xmlns:ocresd = "<http://purl.org/net/OCRe/study_design.owl#>"
+    xmlns:skos   = "<http://www.w3.org/2004/02/skos/core#>"
+    xmlns:ufv    = "<http://vivo.ufl.edu/ontology/vivo-ufl/>"
+    xmlns:vcard  = "<http://www.w3.org/2006/vcard/ns#>"
+    xmlns:vitro-public = "<http://vitro.mannlib.cornell.edu/ns/vitro/public#>"
+    xmlns:vivo   = "<http://vivoweb.org/ontology/core#>"
+    xmlns:scires = "<http://vivoweb.org/ontology/scientific-research#">
 """
     return rdf_header
 
 def rdf_footer():
     """
-    Return a text string suitable for edning an RDF statement to add or
-    remoe RDF/XML to VIVO
+    Return a text string suitable for ending an RDF statement to add or
+    remove RDF/XML to/from VIVO
     """
     rdf_footer = """
 </rdf:RDF>
@@ -2515,11 +2518,11 @@ def vivo_find(type="core:Publisher", label="Humana Press", debug=False):
     except:
         return False
 
-def get_vivo_uri(prefix="http://vivo.ufl.edu/individual/n"):
+def get_vivo_uri():
     """
-    Find an unused VIVO URI at the site with the specified prefix
+    Find an unused VIVO URI with the specified VIVO_URI_PREFIX
     """
-    test_uri = prefix + str(random.randint(1, 9999999999))
+    test_uri = VIVO_URI_PREFIX + 'n' + str(random.randint(1, 9999999999))
     query = """
 	SELECT COUNT(?z) WHERE {
 	<""" + test_uri + """> ?y ?z
@@ -2535,7 +2538,7 @@ def get_vivo_uri(prefix="http://vivo.ufl.edu/individual/n"):
     return test_uri
 
 def vivo_sparql_query(query,
-    baseURL="http://sparql.vivo.ufl.edu/VIVO/sparql",
+    baseURL="http://localhost:8000/vivo16dev/sparql",
     format="application/sparql-results+json", debug=False):
 
     """
@@ -2600,3 +2603,4 @@ def vivo_sparql_query(query,
         return json.loads(response)
     except:
         return None
+

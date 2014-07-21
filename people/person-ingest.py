@@ -54,6 +54,7 @@ from operator import itemgetter
 import codecs
 import sys
 import os
+import json
 import vivofoundation as vf
 
 def comma_space(s):
@@ -129,8 +130,8 @@ def prepare_people(position_file_name):
                 position['DEPTID']+' which is on the department exception '+
                 ' list.  No position will be added.\n')
             person['position_deptid'] = None
-        person['type'] = get_position_type(position['SAL_ADMIN_PLAN'])
-        if person['type'] is None:
+        person['position_type'] = get_position_type(position['SAL_ADMIN_PLAN'])
+        if person['position_type'] is None:
             exc_file.write(ufid+' invalid salary plan '+\
                            position['SAL_ADMIN_PLAN']+'\n')
             continue
@@ -192,7 +193,7 @@ def add_person(person):
     Add a person to VIVO
     """
     add = ""
-    person_uri = vivo_get_uri()
+    person_uri = get_vivo_uri()
     return [add, person_uri]
 
 def update_person(vivo_person, source_person):
@@ -242,7 +243,7 @@ for source_person in people.values():
     print
     print "Consider"
     print
-    print source_person
+    print json.dumps(source_person, indent=4)
     
     if 'uri' in source_person and source_person['uri'] is not None:
         print >>log_file, "Updating person at", source_person['uri']
@@ -251,7 +252,7 @@ for source_person in people.values():
 ##        ardf = ardf + add
 ##        srdf = srdf + sub
     else:
-        print >>log_file, "Adding person at", source_person['uri']
+        print >>log_file, "Adding person", source_person['ufid']
         [add, person_uri] = add_person(source_person)
         vivo_person = {'uri': person_uri}
         ardf = ardf + add
