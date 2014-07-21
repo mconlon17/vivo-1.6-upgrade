@@ -96,20 +96,32 @@ def prepare_people(position_file_name):
     one in the file.
 
     Requires
-    -- a shelve privacy keyed by UFID containing privacy flags
-    -- a shelve off contact data keyed by UFID
+    -- a shelve of privacy data keyed by UFID containing privacy flags
+    -- a shelve of contact data keyed by UFID
     -- a shelve of deptid exception patterns
+    -- a shelve of UFIDs that will not be touched in VIVO
+    -- a shelve of URI that will not be touched in VIVO
     """
     import shelve
     privacy = shelve.open('privacy')
     contact = shelve.open('contact')
     deptid_exceptions = shelve.open('deptid_exceptions')
+    ufid_exceptions = shelve.open('ufid_exceptions')
+    uri_exceptions = shelve.open('uri_exceptions')
+    position_exceptions = shelve.open('position_exceptions')
     people = {}
     positions = read_csv(position_file_name)
     for row, position in sorted(positions.items(), key=itemgetter(1)):
         person = {}
         ufid = str(position['UFID'])
+        if ufid in ufid_exceptions:
+            exc_file.write(ufid+' in ufid_exceptions.  Will be skipped.\n')
+            continue
         person['uri'] = find_vivo_uri('ufVivo:ufid', ufid)
+        if person['uri'] is not None and str(person['uri']) in uri_exceptions:
+            exc_file.write(person['uri']+' in uri_exceptions.'+\
+            '  Will be skipped.\n')
+            continue
         if ok_deptid(position['DEPTID'], deptid_exceptions):
             person['position_deptid'] = position['DEPTID']
         else:
@@ -162,11 +174,18 @@ def prepare_people(position_file_name):
         person['end_date'] = position['END_DATE']
         person['description'] = \
             improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
+        if str(person['description']) in position_exceptions:
+            exc_file.write(description +' found in position exceptions.' +\
+                'The position will not be added.\n')
+            person['description'] = None
         person['hr_position'] = position['HR_POSITION'] == "1"
         people[ufid] = person
     privacy.close()
     contact.close()
     deptid_exceptions.close()
+    ufid_exceptions.close()
+    uri_exceptions.close()
+    position_exceptions.close()
     return people
 
 def add_person(person):

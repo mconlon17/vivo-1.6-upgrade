@@ -97,6 +97,11 @@ CHANGELOG
      -- Support adding people without home departments
     Version 0.98 MC 2014-02-24
     --  Fix email addresses on the way in
+	Version 2.00 MC 2014-07-20
+	--  prepare_people reads data, handles all exception processing.  Relies on 
+	    six shelves.  See create_shelves
+	--  Unicode support throughout
+	--  Position title exceptions added as a shelve, managed externally
 
     Future enhancements:
      -- For case 2, close end dates for positions with explicit HR data rather
