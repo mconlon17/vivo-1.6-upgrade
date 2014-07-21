@@ -102,6 +102,8 @@ CHANGELOG
 	    six shelves.  See create_shelves
 	--  Unicode support throughout
 	--  Position title exceptions added as a shelve, managed externally
+	--  position data now has one additional field -- COMMENT -- normnally empty for production records.  Typically
+		used for annotating test records
 
     Future enhancements:
      -- For case 2, close end dates for positions with explicit HR data rather

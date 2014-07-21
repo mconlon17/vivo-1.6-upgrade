@@ -19,7 +19,6 @@
     Current, the current HR position will be updated or added as needed.
 
     To Do:
-    Add ufid, uri and piosition title exceptions (sheesh!)
     Test cases for all inclusion/exclusion
     Add UF Ontology to vagrant
     Begin output processes
@@ -117,7 +116,8 @@ def prepare_people(position_file_name):
         if ufid in ufid_exceptions:
             exc_file.write(ufid+' in ufid_exceptions.  Will be skipped.\n')
             continue
-        person['uri'] = find_vivo_uri('ufVivo:ufid', ufid)
+        person['ufid'] = ufid
+        person['uri'] = find_vivo_uri('ufv:ufid', ufid)
         if person['uri'] is not None and str(person['uri']) in uri_exceptions:
             exc_file.write(person['uri']+' in uri_exceptions.'+\
             '  Will be skipped.\n')
@@ -129,7 +129,6 @@ def prepare_people(position_file_name):
                 position['DEPTID']+' which is on the department exception '+
                 ' list.  No position will be added.\n')
             person['position_deptid'] = None
-        person['ufid'] = position['UFID']
         person['type'] = get_position_type(position['SAL_ADMIN_PLAN'])
         if person['type'] is None:
             exc_file.write(ufid+' invalid salary plan '+\
