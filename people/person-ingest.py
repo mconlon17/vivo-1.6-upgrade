@@ -123,6 +123,7 @@ def prepare_people(position_file_name):
             exc_file.write(person['uri']+' in uri_exceptions.'+\
             '  Will be skipped.\n')
             continue
+        person['hr_position'] = position['HR_POSITION'] == "1"
         if ok_deptid(position['DEPTID'], deptid_exceptions):
             person['position_deptid'] = position['DEPTID']
         else:
@@ -130,21 +131,28 @@ def prepare_people(position_file_name):
                 position['DEPTID']+' which is on the department exception '+
                 ' list.  No position will be added.\n')
             person['position_deptid'] = None
-        person['position_type'] = get_position_type(position['SAL_ADMIN_PLAN'])
-        if person['position_type'] is None:
-            exc_file.write(ufid+' invalid salary plan '+\
-                           position['SAL_ADMIN_PLAN']+'\n')
-            continue
+        if person['hr_position'] == True:
+            person['position_type'] = \
+                get_position_type(position['SAL_ADMIN_PLAN'])
+            if person['position_type'] is None:
+                exc_file.write(ufid+' invalid salary plan '+\
+                               position['SAL_ADMIN_PLAN']+'\n')
+                continue
+            else:
+                person['position_type'] = None
         if ufid not in privacy:
             exc_file.write(ufid+' not found in privacy data\n')
             continue
         flags = privacy[ufid]
+        print ufid,flags
         if flags['UF_PROTECT_FLG'] == 'Y':
             exc_file.write(ufid+' has protect flag Y\n')
             continue
         if flags['UF_SECURITY_FLG'] == 'Y':
             exc_file.write(ufid+' has security flag Y\n')
             continue
+        person['uf_protect_flg'] = flags['UF_PROTECT_FLG']
+        person['uf_security_flg'] = flags['UF_SECURITY_FLG']
         if ufid not in contact:
             exc_file.write(ufid+' not found in contact data\n')
             continue
@@ -175,10 +183,12 @@ def prepare_people(position_file_name):
         person['description'] = \
             improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
         if str(person['description']) in position_exceptions:
-            exc_file.write(description +' found in position exceptions.' +\
+            exc_file.write(ufid+' has position description '+
+                person['description'] +\
+                ' found in position exceptions.' +\
                 'The position will not be added.\n')
             person['description'] = None
-        person['hr_position'] = position['HR_POSITION'] == "1"
+
         people[ufid] = person
     privacy.close()
     contact.close()

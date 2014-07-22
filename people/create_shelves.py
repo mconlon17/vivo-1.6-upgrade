@@ -115,7 +115,7 @@ position_exceptions.close()
 
 # Privacy
 
-privacy_data = read_csv('privacy_data.txt')
+privacy_data = read_csv('privacy1_data.txt')
 try:
     os.remove('privacy')
 except:

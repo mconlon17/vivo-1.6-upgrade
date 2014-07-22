@@ -12,7 +12,7 @@ __version__ = "2.00"
 concept_dictionary = {}
 
 VIVO_URI_PREFIX = "http://vivo.ufl.edu/individual/"
-VIVO_QUERY_URI = "http://localhost:8000/VIVO/sparql" # For vagrant development
+VIVO_QUERY_URI = "http://localhost:8000/ds/sparql" # For vagrant development
 
 import urllib, urllib2, json, random
 import string
@@ -2538,7 +2538,7 @@ def get_vivo_uri():
     return test_uri
 
 def vivo_sparql_query(query,
-    baseURL="http://localhost:8000/vivo16dev/sparql",
+    baseURL=VIVO_QUERY_URI,
     format="application/sparql-results+json", debug=False):
 
     """

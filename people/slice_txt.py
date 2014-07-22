@@ -12,23 +12,14 @@ __copyright__ = "Copyright 2014, University of Florida"
 __license__ = "BSD 3-Clause license"
 __version__ = "0.1"
 
+import sys
+
 from datetime import datetime
 
 #   Start here
 
-print datetime.now(), "Start"
+print sysargv[1]
 
-in_file = open('position_data.csv','r')
-out_file = open('small_position_data.txt','w')
-k = 0
 
-for line in in_file:
-    k = k + 1
-    if k % 10000 == 0:
-        print k
-    if line[9] == '8':
-        print >>out_file, line,
-in_file.close()
-out_file.close()
 
 print datetime.now(), "End"

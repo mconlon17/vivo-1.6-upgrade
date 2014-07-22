@@ -1,6 +1,8 @@
-84808900 invalid salary plan 
 84808900 has position in department 73001000 which is on the department exception  list.  No position will be added.
 89616918 has home department on exception list. This person will not be added to VIVO.
+84808900 has position description Academic Lump Sum Payment found in position exceptions.The position will not be added.
+80136421 has security flag Y
+80136440 has protect flag Y
 80100558 invalid salary plan OPSN
 55667788 not found in privacy data
 11223344 not found in privacy data
