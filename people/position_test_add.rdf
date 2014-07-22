@@ -23,5 +23,41 @@
     xmlns:vitro-public = "<http://vitro.mannlib.cornell.edu/ns/vitro/public#>"
     xmlns:vivo   = "<http://vivoweb.org/ontology/core#>"
     xmlns:scires = "<http://vivoweb.org/ontology/scientific-research#">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <rdfs:type rdf:resource="http://vivoweb.org/ontology/core#CourtesyFaculty"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <ufv:gatorlink>afh4000</ufv:gatorlink>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <rdfs:label>Hakeem, Abdulaziz</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <ufv:privacyFlag>N</ufv:privacyFlag>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <ufv:ufid>84957104</ufv:ufid>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2303634757">
+        <ufv:homeDept rdf:resource="http://vivo.ufl.edu/individual/n5706"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <rdfs:type rdf:resource="http://vivoweb.org/ontology/core#CourtesyFaculty"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <ufv:gatorlink></ufv:gatorlink>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <rdfs:label>Johnson, Lauren Elizab</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <ufv:privacyFlag>N</ufv:privacyFlag>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <ufv:ufid>80136421</ufv:ufid>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6854444817">
+        <ufv:homeDept rdf:resource=""/>
+    </rdf:Description>
 
 </rdf:RDF>

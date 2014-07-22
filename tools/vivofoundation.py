@@ -412,29 +412,30 @@ def untag_predicate(p):
         http://www.w3.org/1999/02/22-rdf-syntax-ns#type
     """
     ns = {
-    "rdf:":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "vivo:":"http://vivoweb.org/ontology/core#",
-    "ufVivo:":"http://vivo.ufl.edu/ontology/vivo-ufl/",
-    "rdfs:":"http://www.w3.org/2000/01/rdf-schema#",
-    "foaf:":"http://xmlns.com/foaf/0.1/",
-    "bibo:":"http://purl.org/ontology/bibo/",
-    "dcelem:":"http://purl.org/dc/elements/1.1/",
-    "dcterms:":"http://purl.org/dc/terms/",
-    "xsd:":"http://www.w3.org/2001/XMLSchema#",
-    "owl:":"http://www.w3.org/2002/07/owl#",
-    "swrl:":"http://www.w3.org/2003/11/swrl#",
-    "swrlb:":"http://www.w3.org/2003/11/swrlb#",
-    "vitro1:":"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-    "c40:":"http://purl.org/spar/c4o/",
-    "event:":"http://purl.org/NET/c4dm/event.owl#",
-    "fabio:":"http://purl.org/spar/fabio/",
-    "geo:":"http://aims.fao.org/aos/geopolitical.owl#",
-    "pvs:":"http://vivoweb.org/ontology/provenance-support#",
-    "ero:":"http://purl.obolibrary.org/obo/",
-    "scires:":"http://vivoweb.org/ontology/scientific-research#",
-    "skos:":"http://www.w3.org/2004/02/skos/core#",
-    "vitro2:":"http://vitro.mannlib.cornell.edu/ns/vitro/public#"
-    }
+        "rdf:":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs:":"http://www.w3.org/2000/01/rdf-schema#",
+        "xsd:":"http://www.w3.org/2001/XMLSchema#",
+        "owl:":"http://www.w3.org/2002/07/owl#",
+        "swrl:":"http://www.w3.org/2003/11/swrl#",
+        "swrlb:":"http://www.w3.org/2003/11/swrlb#",
+        "vitro:":"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+        "bibo:":"http://purl.org/ontology/bibo/",
+        "c4o:":"http://purl.org/spar/c4o/",
+        "cito:":"http://purl.org/spar/cito/",
+        "event:":"http://purl.org/NET/c4dm/event.owl#",
+        "fabio:":"http://purl.org/spar/fabio/",
+        "foaf:":"http://xmlns.com/foaf/0.1/",
+        "geo:":"http://aims.fao.org/aos/geopolitical.owl#",
+        "obo:":"http://purl.obolibrary.org/obo/",
+        "ocrer:":"http://purl.org/net/OCRe/research.owl#",
+        "ocresd:":"http://purl.org/net/OCRe/study_design.owl#",
+        "skos:":"http://www.w3.org/2004/02/skos/core#",
+        "ufv:":"http://vivo.ufl.edu/ontology/vivo-ufl/",
+        "vcard:":"http://www.w3.org/2006/vcard/ns#",
+        "vitro-public:":"http://vitro.mannlib.cornell.edu/ns/vitro/public#",
+        "vivo:":"http://vivoweb.org/ontology/core#",
+        "scires:":"http://vivoweb.org/ontology/scientific-research#"
+        }
     tag = p[0:p.find(':')+1]
     if tag in ns:
         predicate = p.replace(tag, ns[tag])
@@ -976,7 +977,7 @@ def find_vivo_uri(predicate, value):
     of functional properties and key values.
 
     Notes:
-    --  if the there are mulitple uris that meet the criteria, the first one
+    --  if the there are multiple uris that meet the criteria, the first one
         is returned
     --  if no values meet the criteria, None is returned
     --  this function is very inefficient, making a SPARQL query for every
@@ -2547,27 +2548,29 @@ def vivo_sparql_query(query,
     """
 
     prefix = """
-    PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
-    PREFIX owl:     <http://www.w3.org/2002/07/owl#>
-    PREFIX swrl:    <http://www.w3.org/2003/11/swrl#>
-    PREFIX swrlb:   <http://www.w3.org/2003/11/swrlb#>
-    PREFIX vitro:   <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>
-    PREFIX bibo:    <http://purl.org/ontology/bibo/>
-    PREFIX dcelem:  <http://purl.org/dc/elements/1.1/>
-    PREFIX dcterms: <http://purl.org/dc/terms/>
-    PREFIX event:   <http://purl.org/NET/c4dm/event.owl#>
-    PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
-    PREFIX geo:     <http://aims.fao.org/aos/geopolitical.owl#>
-    PREFIX pvs:     <http://vivoweb.org/ontology/provenance-support#>
-    PREFIX ero:     <http://purl.obolibrary.org/obo/>
-    PREFIX scires:  <http://vivoweb.org/ontology/scientific-research#>
-    PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
-    PREFIX ufVivo:  <http://vivo.ufl.edu/ontology/vivo-ufl/>
-    PREFIX vitro:   <http://vitro.mannlib.cornell.edu/ns/vitro/public#>
-    PREFIX vivo:    <http://vivoweb.org/ontology/core#>
-    PREFIX core:    <http://vivoweb.org/ontology/core#>
+    PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+    PREFIX owl:   <http://www.w3.org/2002/07/owl#>
+    PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>
+    PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>
+    PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>
+    PREFIX bibo: <http://purl.org/ontology/bibo/>
+    PREFIX c4o: <http://purl.org/spar/c4o/>
+    PREFIX cito: <http://purl.org/spar/cito/>
+    PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
+    PREFIX fabio: <http://purl.org/spar/fabio/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX geo: <http://aims.fao.org/aos/geopolitical.owl#>
+    PREFIX obo: <http://purl.obolibrary.org/obo/>
+    PREFIX ocrer: <http://purl.org/net/OCRe/research.owl#>
+    PREFIX ocresd: <http://purl.org/net/OCRe/study_design.owl#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX ufv: <http://vivo.ufl.edu/ontology/vivo-ufl/>
+    PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+    PREFIX vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>
+    PREFIX vivo: <http://vivoweb.org/ontology/core#>
+    PREFIX scires: <http://vivoweb.org/ontology/scientific-research#>
     """
     params = {
         "default-graph":"",

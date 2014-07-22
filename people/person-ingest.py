@@ -45,6 +45,9 @@ from vivofoundation import rdf_footer
 from vivofoundation import find_vivo_uri
 from vivofoundation import get_vivo_uri
 from vivofoundation import read_csv
+from vivofoundation import untag_predicate
+from vivofoundation import assert_resource_property
+from vivofoundation import assert_data_property
 from vivopeople import get_person
 from vivopeople import get_position_type
 from vivopeople import improve_jobcode_description
@@ -95,6 +98,9 @@ def prepare_people(position_file_name):
     to add. If more than one position qualifies for inclusion, use the last
     one in the file.
 
+    Field by field.  Check.  Improve.  Dereference. Generate exceptions.
+    The result should be clean, complete data, ready to be added.
+
     Requires
     -- a shelve of privacy data keyed by UFID containing privacy flags
     -- a shelve of contact data keyed by UFID
@@ -103,6 +109,15 @@ def prepare_people(position_file_name):
     -- a shelve of URI that will not be touched in VIVO
     """
     import shelve
+    person_type_table = {
+        'faculty':'vivo:FacultyMember',
+        'postdoc':'vivo:Postdoc',
+        'courtesy-faculty':'vivo:CourtesyFaculty',
+        'clinical-faculty':'ufv:ClinicalFaculty',
+        'housestaff':'ufv:Housestaff',
+        'temp-faculty':'ufv:TemporaryFaculty',
+        'non-academic':'vivo:NonAcademic'
+        }
     privacy = shelve.open('privacy')
     contact = shelve.open('contact')
     deptid_exceptions = shelve.open('deptid_exceptions')
@@ -112,20 +127,27 @@ def prepare_people(position_file_name):
     people = {}
     positions = read_csv(position_file_name)
     for row, position in sorted(positions.items(), key=itemgetter(1)):
+        anyerrors = False
         person = {}
         ufid = str(position['UFID'])
         if ufid in ufid_exceptions:
             exc_file.write(ufid+' in ufid_exceptions.  Will be skipped.\n')
-            continue
+            anyerrors = True
         person['ufid'] = ufid
         person['uri'] = find_vivo_uri('ufv:ufid', ufid)
         if person['uri'] is not None and str(person['uri']) in uri_exceptions:
             exc_file.write(person['uri']+' in uri_exceptions.'+\
             '  Will be skipped.\n')
-            continue
+            anyerrors = True
         person['hr_position'] = position['HR_POSITION'] == "1"
         if ok_deptid(position['DEPTID'], deptid_exceptions):
             person['position_deptid'] = position['DEPTID']
+            depturi = find_vivo_uri('ufv:deptID', position['DEPTID'])
+            person['position_depturi'] = depturi
+            if depturi is None:
+                exc_file.write(ufid+' has deptid ' + position['DEPTID'] +\
+                               ' not found.\n')
+                anyerrors = True
         else:
             exc_file.write(ufid+' has position in department '+\
                 position['DEPTID']+' which is on the department exception '+
@@ -137,47 +159,56 @@ def prepare_people(position_file_name):
             if person['position_type'] is None:
                 exc_file.write(ufid+' invalid salary plan '+\
                                position['SAL_ADMIN_PLAN']+'\n')
-                continue
-            else:
-                person['position_type'] = None
+                anyerrors = True
+        else:
+            person['position_type'] = None
+        if person['position_type'] in person_type_table:
+            person['person_type'] = \
+                untag_predicate(person_type_table[\
+                    person['position_type']])
+        elif person['position_type'] is not None:
+            exc_file.write(ufid+' has position type ' +
+                person['position_type']+' not in person_type_table\n')
+            anyerrors = True
         if ufid not in privacy:
             exc_file.write(ufid+' not found in privacy data\n')
-            continue
-        flags = privacy[ufid]
-        print ufid,flags
-        if flags['UF_PROTECT_FLG'] == 'Y':
-            exc_file.write(ufid+' has protect flag Y\n')
-            continue
-        if flags['UF_SECURITY_FLG'] == 'Y':
-            exc_file.write(ufid+' has security flag Y\n')
-            continue
-        person['uf_protect_flg'] = flags['UF_PROTECT_FLG']
-        person['uf_security_flg'] = flags['UF_SECURITY_FLG']
+            anyerrors = True
+        else:
+            person['uf_privacy'] = privacy[ufid]['UF_PROTECT_FLG']
+            if person['uf_privacy'] == 'Y':
+                exc_file.write(ufid+' has protect flag Y\n')
+                anyerrors = True
         if ufid not in contact:
             exc_file.write(ufid+' not found in contact data\n')
-            continue
-        info = contact[ufid]
-        person['first_name'] = info['FIRST_NAME'].title()
-        person['last_name'] = info['LAST_NAME'].title()
-        person['middle_name'] = info['MIDDLE_NAME'].title()
-        person['name_suffix'] = info['NAME_SUFFIX'].title()
-        person['name_prefix'] = info['NAME_PREFIX'].title()
-        person['display_name'] = comma_space(info['DISPLAY_NAME'].title())
-        person['gatorlink'] = info['GATORLINK'].lower()
-        if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
-            person['preferred_title'] = \
-                improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
+            anyerrors = True
         else:
-            person['preferred_title'] = info['WORKINGTITLE']
-        person['primary_email'] = repair_email(info['UF_BUSINESS_EMAIL'])
-        person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
-        person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
-        if ok_deptid(info['HOME_DEPT'], deptid_exceptions):
-            person['home_deptid'] = info['HOME_DEPT']
-        else:
-            exc_file.write(ufid+' has home department on exception list.'+\
-                ' This person will not be added to VIVO.\n')
-            continue
+            info = contact[ufid]
+            person['first_name'] = info['FIRST_NAME'].title()
+            person['last_name'] = info['LAST_NAME'].title()
+            person['middle_name'] = info['MIDDLE_NAME'].title()
+            person['name_suffix'] = info['NAME_SUFFIX'].title()
+            person['name_prefix'] = info['NAME_PREFIX'].title()
+            person['display_name'] = comma_space(info['DISPLAY_NAME'].title())
+            person['gatorlink'] = info['GATORLINK'].lower()
+            if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
+                person['preferred_title'] = \
+                    improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
+            else:
+                person['preferred_title'] = info['WORKINGTITLE']
+            person['primary_email'] = repair_email(info['UF_BUSINESS_EMAIL'])
+            person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
+            person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
+            if ok_deptid(info['HOME_DEPT'], deptid_exceptions):
+                person['home_deptid'] = info['HOME_DEPT']
+                homedept_uri = find_vivo_uri('ufv:deptID', info['HOME_DEPT'])
+                person['homedept_uri'] = homedept_uri
+                if homedept_uri is None:
+                    exc_file.write(ufid + ' has home department deptid '+\
+                        info['HOME_DEPT'] + ' not found in VIVO\n')
+            else:
+                exc_file.write(ufid+' has home department on exception list.'+\
+                    ' This person will not be added to VIVO.\n')
+                anyerrors = True
         person['start_date'] = position['START_DATE']
         person['end_date'] = position['END_DATE']
         person['description'] = \
@@ -188,8 +219,8 @@ def prepare_people(position_file_name):
                 ' found in position exceptions.' +\
                 'The position will not be added.\n')
             person['description'] = None
-
-        people[ufid] = person
+        if not anyerrors:
+            people[row] = person
     privacy.close()
     contact.close()
     deptid_exceptions.close()
@@ -198,13 +229,62 @@ def prepare_people(position_file_name):
     position_exceptions.close()
     return people
 
+def add_vcard(a,b):
+    return ""
+
+def add_position(a,b):
+    return ""
+
 def add_person(person):
     """
-    Add a person to VIVO
+    Add a person to VIVO.  The person structure may have any number of
+    elements.  These elements may represent direct assertions (label,
+    ufid, homeDept), vcard assertions (contact info, name parts),
+    and/or position assertions (title, tye, dept, start, end dates)
     """
-    add = ""
+    ardf = ""
     person_uri = get_vivo_uri()
-    return [add, person_uri]
+
+    # Add direct assertions
+
+    person_type = person['person_type']
+    ardf = ardf + assert_resource_property(person_uri, 'rdfs:type', person_type)
+
+    direct_data_preds = {'ufid':'ufv:ufid',
+                         'uf_privacy':'ufv:privacyFlag',
+                         'display_name':'rdfs:label',
+                         'gatorlink':'ufv:gatorlink'
+                         }
+    direct_resource_preds = {'homedept_uri':'ufv:homeDept'}
+    for key in direct_data_preds:
+        if key in person:
+            pred = direct_data_preds[key]
+            val = person[key]
+            ardf = ardf + assert_data_property(person_uri, pred, val)
+    for key in direct_resource_preds:
+        if key in person:
+            pred = direct_resource_preds[key]
+            val = person[key]
+            ardf = ardf + assert_resource_property(person_uri, pred, val)
+
+    # Add Vcard Assertions
+
+    vcard = {}
+    for key in ['last_name', 'first_name', 'middle_name', 'primary_email',
+                'name_prefix', 'name_suffix', 'fax', 'phone', 'preferred_title',
+                ]:
+        vcard[key] = person[key]
+    ardf = ardf + add_vcard(person_uri, vcard)
+
+    # Add Position Assertions
+
+    position = {}
+    for key in ['start_date', 'description', 'end_date', 'position_depturi',
+                'position_type']:
+        position[key] = person[key]
+    ardf = ardf + add_position(person_uri, position)
+    
+    return [ardf, person_uri]
 
 def update_person(vivo_person, source_person):
     """
@@ -215,6 +295,13 @@ def update_person(vivo_person, source_person):
     """
     ardf = ""
     srdf = ""
+
+    # Update direct assertions
+
+    # Update vcard assertions
+
+    # Update positions and their assertions
+    
     return [ardf, srdf]
 
 # Start here
