@@ -1,7 +1,7 @@
 #!/usr/bin/env/python
 
 """
-    person-ingest.py: Given person data from HR, compare to VIVO and
+    person_ingest.py: Given person data from HR, compare to VIVO and
     create addition and subtration RDF for VIVO to create and update
     people, positions, contact information and current status in
     accordance with UF privacy practices.
@@ -130,16 +130,21 @@ def prepare_people(position_file_name):
         anyerrors = False
         person = {}
         ufid = str(position['UFID'])
+        
         if ufid in ufid_exceptions:
             exc_file.write(ufid+' in ufid_exceptions.  Will be skipped.\n')
             anyerrors = True
-        person['ufid'] = ufid
+        else:   
+            person['ufid'] = ufid
+        
         person['uri'] = find_vivo_uri('ufv:ufid', ufid)
         if person['uri'] is not None and str(person['uri']) in uri_exceptions:
             exc_file.write(person['uri']+' in uri_exceptions.'+\
             '  Will be skipped.\n')
             anyerrors = True
+            
         person['hr_position'] = position['HR_POSITION'] == "1"
+        
         if ok_deptid(position['DEPTID'], deptid_exceptions):
             person['position_deptid'] = position['DEPTID']
             depturi = find_vivo_uri('ufv:deptID', position['DEPTID'])
@@ -152,7 +157,7 @@ def prepare_people(position_file_name):
             exc_file.write(ufid+' has position in department '+\
                 position['DEPTID']+' which is on the department exception '+
                 ' list.  No position will be added.\n')
-            person['position_deptid'] = None
+            anyerrors = True
         if person['hr_position'] == True:
             person['position_type'] = \
                 get_position_type(position['SAL_ADMIN_PLAN'])
@@ -183,21 +188,46 @@ def prepare_people(position_file_name):
             anyerrors = True
         else:
             info = contact[ufid]
-            person['first_name'] = info['FIRST_NAME'].title()
-            person['last_name'] = info['LAST_NAME'].title()
-            person['middle_name'] = info['MIDDLE_NAME'].title()
-            person['name_suffix'] = info['NAME_SUFFIX'].title()
-            person['name_prefix'] = info['NAME_PREFIX'].title()
-            person['display_name'] = comma_space(info['DISPLAY_NAME'].title())
-            person['gatorlink'] = info['GATORLINK'].lower()
-            if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
-                person['preferred_title'] = \
-                    improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
-            else:
-                person['preferred_title'] = info['WORKINGTITLE']
-            person['primary_email'] = repair_email(info['UF_BUSINESS_EMAIL'])
-            person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
-            person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
+
+            if info['FIRST_NAME'].title() != '':
+                person['first_name'] = info['FIRST_NAME'].title()
+
+            if info['LAST_NAME'].title() != '':
+                person['last_name'] = info['LAST_NAME'].title()
+
+            if info['MIDDLE_NAME'].title() != '':
+                person['middle_name'] = info['MIDDLE_NAME'].title()
+
+            if info['NAME_SUFFIX'].title() != '':
+                person['name_suffix'] = info['NAME_SUFFIX'].title()
+
+            if info['NAME_PREFIX'].title() != '':
+                person['name_prefix'] = info['NAME_PREFIX'].title()
+
+            if info['DISPLAY_NAME'] != '':
+                person['display_name'] = comma_space(info['DISPLAY_NAME'].\
+                                                     title())
+
+            if info['GATORLINK'] != '':
+                person['gatorlink'] = info['GATORLINK'].lower()
+
+            if info['WORKINGTITLE'] != '':
+                if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
+                    person['preferred_title'] = \
+                        improve_jobcode_description(\
+                            position['JOBCODE_DESCRIPTION'])
+                else:
+                    person['preferred_title'] = info['WORKINGTITLE']
+                    
+            if info['UF_BUSINESS_EMAIL'] != '':
+                person['primary_email'] = \
+                                        repair_email(info['UF_BUSINESS_EMAIL'])
+            if info['UF_BUSINESS_PHONE'] != '':
+                person['phone'] = repair_phone_number(info['UF_BUSINESS_PHONE'])
+                
+            if info['UF_BUSINESS_FAX'] != '':
+                person['fax'] = repair_phone_number(info['UF_BUSINESS_FAX'])
+                    
             if ok_deptid(info['HOME_DEPT'], deptid_exceptions):
                 person['home_deptid'] = info['HOME_DEPT']
                 homedept_uri = find_vivo_uri('ufv:deptID', info['HOME_DEPT'])
@@ -205,20 +235,27 @@ def prepare_people(position_file_name):
                 if homedept_uri is None:
                     exc_file.write(ufid + ' has home department deptid '+\
                         info['HOME_DEPT'] + ' not found in VIVO\n')
+                    anyerrors = True
             else:
                 exc_file.write(ufid+' has home department on exception list.'+\
                     ' This person will not be added to VIVO.\n')
                 anyerrors = True
-        person['start_date'] = position['START_DATE']
-        person['end_date'] = position['END_DATE']
-        person['description'] = \
-            improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
-        if str(person['description']) in position_exceptions:
-            exc_file.write(ufid+' has position description '+
-                person['description'] +\
-                ' found in position exceptions.' +\
-                'The position will not be added.\n')
-            person['description'] = None
+
+        if position['START_DATE'] != '':
+            person['start_date'] = position['START_DATE']
+
+        if position['END_DATE'] != '':
+            person['end_date'] = position['END_DATE']
+
+        if position['JOBCODE_DESCRIPTION'] != '':            
+            person['description'] = \
+                improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
+            if str(person['description']) in position_exceptions:
+                exc_file.write(ufid+' has position description '+
+                    person['description'] +\
+                    ' found in position exceptions.' +\
+                    'The position will not be added.\n')
+                anyerrors = True
         if not anyerrors:
             people[row] = person
     privacy.close()
@@ -229,11 +266,25 @@ def prepare_people(position_file_name):
     position_exceptions.close()
     return people
 
-def add_vcard(a,b):
-    return ""
+def add_vcard(person_uri, vcard):
+    """
+    Given a person_uri and a vcard dictionary of items on the vcard,
+    generate ther RDF necessary to create the vcard, associate it with
+    the person, and associate attributes to the vcard.
+    """
+    ardf = ""
+    vcard_uri = get_vivo_uri()
+    return [ardf, vcard_uri]
 
-def add_position(a,b):
-    return ""
+def add_position(position_uri, position):
+    """
+    Given a person_uri and a position dictionary containing the attributes
+    of a position, generate the RDF necessarey to create the position,
+    associate it with the person and assign its attributes.
+    """
+    ardf = ""
+    position_uri = get_vivo_uri()
+    return [ardf, position_uri]
 
 def add_person(person):
     """
@@ -273,16 +324,20 @@ def add_person(person):
     for key in ['last_name', 'first_name', 'middle_name', 'primary_email',
                 'name_prefix', 'name_suffix', 'fax', 'phone', 'preferred_title',
                 ]:
-        vcard[key] = person[key]
-    ardf = ardf + add_vcard(person_uri, vcard)
+        if key in person:
+            vcard[key] = person[key]
+    [add, vcard_uri] = add_vcard(person_uri, vcard)
+    ardf = ardf + add
 
     # Add Position Assertions
 
     position = {}
     for key in ['start_date', 'description', 'end_date', 'position_depturi',
                 'position_type']:
-        position[key] = person[key]
-    ardf = ardf + add_position(person_uri, position)
+        if key in person:
+            position[key] = person[key]
+    [add, position_uri] = add_position(person_uri, position)
+    ardf = ardf + add
     
     return [ardf, person_uri]
 
@@ -353,9 +408,6 @@ for source_person in people.values():
         [add, person_uri] = add_person(source_person)
         vivo_person = {'uri': person_uri}
         ardf = ardf + add
-        [add, sub] = update_person(vivo_person, source_person)
-        ardf = ardf + add
-        srdf = srdf + sub
 
 adrf = ardf + rdf_footer()
 srdf = srdf + rdf_footer()

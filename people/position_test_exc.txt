@@ -1,5 +1,3 @@
-80104480 has deptid 16900000 not found.
-80104480 has home department deptid 16900000 not found in VIVO
 83441167 has deptid 29200000 not found.
 83441167 has home department deptid 29200000 not found in VIVO
 84808900 has position in department 73001000 which is on the department exception  list.  No position will be added.
@@ -8,9 +6,7 @@
 80136421 has home department deptid  not found in VIVO
 80136440 has protect flag Y
 80136440 has home department deptid ST010000 not found in VIVO
-80100558 has deptid 13500000 not found.
 80100558 invalid salary plan OPSN
-80100558 has home department deptid 13500000 not found in VIVO
 55667788 not found in privacy data
 55667788 not found in contact data
 http://vivo.ufl.edu/individual/n4452 in uri_exceptions.  Will be skipped.
