@@ -242,10 +242,22 @@ def prepare_people(position_file_name):
                 anyerrors = True
 
         if position['START_DATE'] != '':
-            person['start_date'] = position['START_DATE']
+            try:
+                person['start_date'] = datetime.strptime(position['START_DATE'],\
+                    '%Y-%m-%d')
+            except ValueError:
+                exc_file.write(ufid + ' invalid start date ' +\
+                               position['START_DATE']+'\n')
+                anyerrors = True
 
         if position['END_DATE'] != '':
-            person['end_date'] = position['END_DATE']
+            try:
+                person['end_date'] = datetime.strptime(position['END_DATE'],\
+                    '%Y-%m-%d')
+            except ValueError:
+                exc_file.write(ufid + ' invalid end date ' +\
+                               position['END_DATE']+'\n')
+                anyerrors = True
 
         if position['JOBCODE_DESCRIPTION'] != '':            
             person['description'] = \
@@ -271,19 +283,164 @@ def add_vcard(person_uri, vcard):
     Given a person_uri and a vcard dictionary of items on the vcard,
     generate ther RDF necessary to create the vcard, associate it with
     the person, and associate attributes to the vcard.
+
+    The person_uri will be associated to the vcard and the vcard may have
+    any number of single entry entities to references.  The single_entry
+    table controls the processing of these entities.
+
+    The name entity is a special case. All values are attrbuted to the name
+    entity.
+
+    The single_entry table contains some additional keys for future use
+    Both the name table and the single entry table are easily extensible to
+    handle additional name attributes and additional single entry entities
+    respectively.
     """
+    single_entry = {
+        'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                          'pred':'vcard:email'},
+        'email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                  'pred':'vcard:email'},
+        'fax': {'resource':'vcard:hasTelephone','type':'vcard:Fax',
+                'pred':'vcard:telephone'},
+        'telephone': {'resource':'vcard:hasTelephone','type':'vcard:Telephone',
+                      'pred':'vcard:telephone'},
+        'preferred_title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                            'pred':'vcard:title'},
+        'title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                  'pred':'vcard:title'}
+    }
+    name_table = {
+        'first_name' : 'vcard:givenName',
+        'last_name' : 'vcard:familyName',
+        'middle_name' : 'vcard:additionalName',
+        'name_prefix' : 'vcard:honoraryPrefix',
+        'name_suffix' : 'vcard:honorarySuffix'
+        }
     ardf = ""
     vcard_uri = get_vivo_uri()
+    ardf = ardf + assert_resource_property(vcard_uri, 'rdf:type',
+                                           untag_predicate('vcard:Individual'))
+    ardf = ardf + assert_resource_property(person_uri, 'obo:ARG2000028',
+                                           vcard_uri) # hasContactInfo
+    ardf = ardf + assert_resource_property(vcard_uri, 'obo:ARG2000029',
+                                           person_uri) # contactInfoOf
+
+    # Create the name entity and attach to vcard. For each key in the
+    # name_table, assert its value to the name entity
+
+    name_uri = get_vivo_uri()
+    ardf = ardf + assert_resource_property(name_uri, 'rdf:type',
+                                           untag_predicate('vcard:Name'))
+    ardf = ardf + assert_resource_property(vcard_uri, 'vcard:hasName',
+                                           name_uri)
+    for key in vcard.keys():
+        if key in name_table:
+            pred = name_table[key]
+            val = vcard[key]
+            ardf = ardf + assert_data_property(name_uri,
+                pred, val)            
+
+    # Process single entry vcard bits of info:
+    #   Go through the keys in the vcard.  If it's a single entry key, then
+    #   create it.  Assign the data vaue and link the vcard to the single
+    #   entry entity
+
+    for key in vcard.keys():
+        if key in single_entry:
+            val = vcard[key]
+            entry = single_entry[key]
+            entry_uri = get_vivo_uri()
+            ardf = ardf + assert_resource_property(entry_uri,
+                'rdf:type', untag_predicate(entry['type']))
+            ardf = ardf + assert_data_property(entry_uri,
+                entry['pred'], val)
+            ardf = ardf + assert_resource_property(vcard_uri,
+                entry['resource'], entry_uri)
     return [ardf, vcard_uri]
 
-def add_position(position_uri, position):
+def add_dtv(dtv):
+    """
+    Given values for a date time value, generate the RDF necessary to add the
+    datetime value to VIVO
+
+    date_time           datetime value
+    datetime_precision  text string in tag format of VIVO date time precision,
+                        example 'vivo:yearMonthDayPrecision'
+
+    """
+    ardf = ""
+    if 'date_time' not in dtv or 'datetime_precision' not in dtv or \
+       dtv['date_time'] is None:
+        return ["", None]
+    else:
+        dtv_uri = get_vivo_uri()
+        dtv_string = dtv['date_time'].isoformat()
+        ardf = ardf + assert_resource_property(dtv_uri,
+            'rdf:type', untag_predicate('vivo:DateTimeValue'))
+        ardf = ardf + assert_data_property(dtv_uri,
+            'vivo:dateTime', dtv_string)
+        ardf = ardf + assert_resource_property(dtv_uri,
+            'vivo:dateTimePrecision', untag_predicate(dtv['datetime_precision']))
+        return [ardf, dtv_uri]
+
+def add_dti(dti):
+    """
+    Given date time interval attributes, return rdf to create the date time
+    interval
+
+    start   start date as a datetime or None or not present
+    end     start date as a datetime or None or not present
+
+    Assumes yearMonthDayPrecision for start and end
+    """
+    ardf = ""
+        
+    dtv = {'date_time' : dti.get('start',None),
+           'datetime_precision': 'vivo:yearMonthDayPrecision'}
+    [add, start_uri] = add_dtv(dtv)
+    ardf = ardf + add
+    dtv = {'date_time' : dti.get('end',None),
+           'datetime_precision': 'vivo:yearMonthDayPrecision'}
+    [add, end_uri] = add_dtv(dtv)
+    ardf = ardf + add
+    if start_uri is None and end_uri is None:
+        return ["", None]
+    else:
+        dti_uri = get_vivo_uri()
+        ardf = ardf + assert_resource_property(dti_uri,
+                'rdf:type', untag_predicate('vivo:DateTimeInterval'))
+        if start_uri is not None:
+            ardf = ardf + assert_resource_property(dti_uri,
+                    'vivo:start', start_uri)
+        if end_uri is not None:
+            ardf = ardf + assert_resource_property(dti_uri,
+                    'rdf:end', end_uri)
+        return [ardf, dti_uri]
+
+def add_position(person_uri, position):
     """
     Given a person_uri and a position dictionary containing the attributes
-    of a position, generate the RDF necessarey to create the position,
+    of a position, generate the RDF necessary to create the position,
     associate it with the person and assign its attributes.
     """
     ardf = ""
     position_uri = get_vivo_uri()
+    dti = {'start' : position.get('start_date',None),
+           'end': position.get('end_date',None)}
+    [add, dti_uri] = add_dti(dti)
+    ardf = ardf + add
+    ardf = ardf + assert_resource_property(position_uri,
+            'rdf:type', position['position_type'])
+    ardf = ardf + assert_resource_property(position_uri,
+            'rdfs:label', position['description'])
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:dateTimeInterval', dti_uri)
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:relates', person_uri)
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:relates', position['position_depturi'])
+    
     return [ardf, position_uri]
 
 def add_person(person):
@@ -299,7 +456,11 @@ def add_person(person):
     # Add direct assertions
 
     person_type = person['person_type']
-    ardf = ardf + assert_resource_property(person_uri, 'rdfs:type', person_type)
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type', person_type)
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
+                        untag_predicate('ufv:UFEntity'))
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
+                        untag_predicate('ufv:UFCurrentEntity'))
 
     direct_data_preds = {'ufid':'ufv:ufid',
                          'uf_privacy':'ufv:privacyFlag',
@@ -324,7 +485,7 @@ def add_person(person):
     for key in ['last_name', 'first_name', 'middle_name', 'primary_email',
                 'name_prefix', 'name_suffix', 'fax', 'phone', 'preferred_title',
                 ]:
-        if key in person:
+        if key in person.keys():
             vcard[key] = person[key]
     [add, vcard_uri] = add_vcard(person_uri, vcard)
     ardf = ardf + add
@@ -334,12 +495,25 @@ def add_person(person):
     position = {}
     for key in ['start_date', 'description', 'end_date', 'position_depturi',
                 'position_type']:
-        if key in person:
+        if key in person.keys():
             position[key] = person[key]
+
     [add, position_uri] = add_position(person_uri, position)
     ardf = ardf + add
     
     return [ardf, person_uri]
+
+def get_person(person_uri):
+    """
+    Given a the URI of a person in VIVO, get the poerson's attributes and
+    return a flat, keyed structure appropriate for update and other
+    applications.
+
+    To Do:
+    Add get_grants, get_papers, etc as we had previously
+    """
+    person = {'uri': person_uri}
+    return person
 
 def update_person(vivo_person, source_person):
     """
@@ -353,7 +527,7 @@ def update_person(vivo_person, source_person):
 
     # Update direct assertions
 
-    # Update vcard assertions
+    # Update vcard and its assertions
 
     # Update positions and their assertions
     
@@ -395,14 +569,19 @@ for source_person in people.values():
     print
     print "Consider"
     print
-    print json.dumps(source_person, indent=4)
+    view_person = dict(source_person)
+    if view_person.get('end_date',None) is not None:
+        view_person['end_date'] = view_person['end_date'].isoformat()
+    if view_person.get('start_date',None) is not None:
+        view_person['start_date'] = view_person['start_date'].isoformat()       
+    print json.dumps(view_person, indent=4)
     
     if 'uri' in source_person and source_person['uri'] is not None:
         print >>log_file, "Updating person at", source_person['uri']
-##        vivo_person = get_person(source_person['uri'])
-##        [add, sub] = update_person(vivo_person, source_person)
-##        ardf = ardf + add
-##        srdf = srdf + sub
+        vivo_person = get_person(source_person['uri'])
+        [add, sub] = update_person(vivo_person, source_person)
+        ardf = ardf + add
+        srdf = srdf + sub
     else:
         print >>log_file, "Adding person", source_person['ufid']
         [add, person_uri] = add_person(source_person)

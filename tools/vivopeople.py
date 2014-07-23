@@ -162,9 +162,6 @@ def improve_jobcode_description(s):
                   # words throughout the string
     t = s.replace(", ,", ",")
     t = t.replace("  ", " ")
-    t = t.replace(" & ", " and ")
-    t = t.replace(" &", " and ")
-    t = t.replace("&", " and ")
     t = t.replace("/", " @")
     t = t.replace("/", " @") # might be two slashes in the input
     t = t.replace(",", " !")
