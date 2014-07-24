@@ -1,12 +1,27 @@
+80104480 not found in privacy data
+80104480 not found in contact data
 83441167 has deptid 29200000 not found.
-83441167 has home department deptid 29200000 not found in VIVO
+83441167 not found in privacy data
+83441167 not found in contact data
+84957104 not found in privacy data
+84957104 not found in contact data
+84808900 not found in privacy data
+84808900 not found in contact data
 84808900 has position in department 73001000 which is on the department exception  list.  No position will be added.
-89616918 has home department on exception list. This person will not be added to VIVO.
+84808900 not found in privacy data
+84808900 not found in contact data
+89616918 not found in privacy data
+89616918 not found in contact data
+84808900 not found in privacy data
+84808900 not found in contact data
 84808900 has position description Academic Lump Sum Payment found in position exceptions.The position will not be added.
-80136421 has home department deptid  not found in VIVO
-80136440 has protect flag Y
-80136440 has home department deptid ST010000 not found in VIVO
+80136421 not found in privacy data
+80136421 not found in contact data
+80136440 not found in privacy data
+80136440 not found in contact data
 80100558 invalid salary plan OPSN
+80100558 not found in privacy data
+80100558 not found in contact data
 55667788 not found in privacy data
 55667788 not found in contact data
 http://vivo.ufl.edu/individual/n4452 in uri_exceptions.  Will be skipped.

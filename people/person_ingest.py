@@ -48,7 +48,6 @@ from vivofoundation import read_csv
 from vivofoundation import untag_predicate
 from vivofoundation import assert_resource_property
 from vivofoundation import assert_data_property
-from vivopeople import get_person
 from vivopeople import get_position_type
 from vivopeople import improve_jobcode_description
 from vivopeople import repair_phone_number
@@ -512,7 +511,38 @@ def get_person(person_uri):
     To Do:
     Add get_grants, get_papers, etc as we had previously
     """
-    person = {'uri': person_uri}
+    from vivofoundation import get_triples
+    person = {'person_uri': person_uri}
+    reult = get_triples(person_uri)
+    triples = vivo_sparql_query(query)
+    try:
+        count = len(triples["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = triples["results"]["bindings"][i]
+        p = b['p']['value']
+        o = b['o']['value']
+        if p == \
+           "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType":
+            person['person_type'] = o
+        if p == "http://purl.obolibrary.org/obo/ARG_2000028":
+            person['vcard_uri'] = o
+        if p == "http://www.w3.org/2000/01/rdf-schema#label":
+            person['display_name'] = o
+        if p == "http://vivoweb.org/ontology/core#faxNumber":
+            person['fax_number'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/ufid":
+            person['ufid'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/homedept":
+            person['homedept_uri'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/privacyFlag":
+            person['privacy_flag'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink":
+            person['gatorlink'] = o
+        if p == "http://vivoweb.org/ontology/core#eRACommonsId":
+            person['eracommonsid'] = o
     return person
 
 def update_person(vivo_person, source_person):
@@ -579,6 +609,8 @@ for source_person in people.values():
     if 'uri' in source_person and source_person['uri'] is not None:
         print >>log_file, "Updating person at", source_person['uri']
         vivo_person = get_person(source_person['uri'])
+        print "\nGet_person results:"
+        print json.dumps(vivo_person, indent=4)
         [add, sub] = update_person(vivo_person, source_person)
         ardf = ardf + add
         srdf = srdf + sub
