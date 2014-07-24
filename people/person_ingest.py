@@ -48,16 +48,21 @@ from vivofoundation import read_csv
 from vivofoundation import untag_predicate
 from vivofoundation import assert_resource_property
 from vivofoundation import assert_data_property
+from vivofoundation import update_entity
 from vivopeople import get_position_type
 from vivopeople import improve_jobcode_description
 from vivopeople import repair_phone_number
 from vivopeople import repair_email
+from vivopeople import get_person
 from operator import itemgetter
 import codecs
 import sys
 import os
 import json
 import vivofoundation as vf
+
+__harvest_text__ = "Python Person Ingest " + __version__
+__harvest_time__ = datetime.now().isoformat()
 
 def comma_space(s):
     """
@@ -178,8 +183,8 @@ def prepare_people(position_file_name):
             exc_file.write(ufid+' not found in privacy data\n')
             anyerrors = True
         else:
-            person['uf_privacy'] = privacy[ufid]['UF_PROTECT_FLG']
-            if person['uf_privacy'] == 'Y':
+            person['privacy_flag'] = privacy[ufid]['UF_PROTECT_FLG']
+            if person['privacy_flag'] == 'Y':
                 exc_file.write(ufid+' has protect flag Y\n')
                 anyerrors = True
         if ufid not in contact:
@@ -267,6 +272,8 @@ def prepare_people(position_file_name):
                     ' found in position exceptions.' +\
                     'The position will not be added.\n')
                 anyerrors = True
+        person['date_harvested'] = __harvest_time__
+        person['harvested_by'] = __harvest_text__
         if not anyerrors:
             people[row] = person
     privacy.close()
@@ -462,7 +469,7 @@ def add_person(person):
                         untag_predicate('ufv:UFCurrentEntity'))
 
     direct_data_preds = {'ufid':'ufv:ufid',
-                         'uf_privacy':'ufv:privacyFlag',
+                         'privacy_flag':'ufv:privacyFlag',
                          'display_name':'rdfs:label',
                          'gatorlink':'ufv:gatorlink'
                          }
@@ -502,60 +509,66 @@ def add_person(person):
     
     return [ardf, person_uri]
 
-def get_person(person_uri):
-    """
-    Given a the URI of a person in VIVO, get the poerson's attributes and
-    return a flat, keyed structure appropriate for update and other
-    applications.
-
-    To Do:
-    Add get_grants, get_papers, etc as we had previously
-    """
-    from vivofoundation import get_triples
-    person = {'person_uri': person_uri}
-    reult = get_triples(person_uri)
-    triples = vivo_sparql_query(query)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == \
-           "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType":
-            person['person_type'] = o
-        if p == "http://purl.obolibrary.org/obo/ARG_2000028":
-            person['vcard_uri'] = o
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            person['display_name'] = o
-        if p == "http://vivoweb.org/ontology/core#faxNumber":
-            person['fax_number'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/ufid":
-            person['ufid'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/homedept":
-            person['homedept_uri'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/privacyFlag":
-            person['privacy_flag'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink":
-            person['gatorlink'] = o
-        if p == "http://vivoweb.org/ontology/core#eRACommonsId":
-            person['eracommonsid'] = o
-    return person
-
 def update_person(vivo_person, source_person):
     """
     Given a data structure representing a person in VIVO, and a data
     structure rpesenting the same person with data values from source
     systems, generate the ADD and SUB RDF necessary to update the VIVO
     person's data values to the corresponding values in the source
+
+    These data structures are NOT comparable.  The VIVO data structure is the
+    structure returned by get_person and reflects the hieriarchical and
+    repeating nature of data in VIVO.  The source data structure is flat,
+    representing the single-valued input file
+
+    Key values are grouped into three sets -- direct (attributes of the
+    person directly), vcard attributes and position attributes
+
+    There are only 22 attributes.  How difficult could it be to update
+    them in VIVO?
     """
+    direct_key_table = {
+    'privacy_flag': {'predicate': 'ufv:privacyFlag',
+                    'action': 'literal'},
+    'homedept_uri': {'predicate': 'ufv:homeDept',
+                    'action': 'resource'},
+    'display_name': {'predicate': 'rdfs:label',
+                    'action': 'literal'},
+    'ufid': {'predicate': 'ufv:ufid',
+                    'action': 'literal'},
+    'gatorlink': {'predicate': 'ufv:gatorlink',
+                    'action': 'literal'},
+    'person_type': {'predicate': 'rdf:type',
+                    'action': 'literal'},
+    'date_harvested': {'predicate': 'ufv:dateHarvested',
+                    'action': 'literal'},
+    'harvested_by': {'predicate': 'ufv:harvestedBy',
+                    'action': 'literal'}
+    }
+
+    vcard_keys = ['phone', 'preferred_title', 'first_name',
+                  'primary_email',
+                  'name_prefix', 'name_suffix', 'middle_name', 'fax',
+                  'last_name']
+    position_keys = ['description', 'end_date', 'position_type',
+                     'position_depturi', 'start_date']
+    
     ardf = ""
     srdf = ""
 
-    # Update direct assertions
+    # Update some things.  This never goes well
+    # First.  The vivo entity has to have a key value 'uri'
+    # Second.  If the source data is not an HR position, it does not
+    # have authoritative information to update the person type
+
+    vivo_person['uri'] = vivo_person['person_uri']
+    if source_person['hr_position'] == False:
+        del direct_key_table['person_type']
+
+    [add, sub] = update_entity(vivo_person, source_person, \
+                               direct_key_table)
+    ardf = ardf + add
+    srdf = srdf + sub
 
     # Update vcard and its assertions
 
@@ -611,6 +624,7 @@ for source_person in people.values():
         vivo_person = get_person(source_person['uri'])
         print "\nGet_person results:"
         print json.dumps(vivo_person, indent=4)
+        print
         [add, sub] = update_person(vivo_person, source_person)
         ardf = ardf + add
         srdf = srdf + sub

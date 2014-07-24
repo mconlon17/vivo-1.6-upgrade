@@ -239,6 +239,86 @@ def hr_abbrev_to_words(s):
     t = t.replace(" #", "-") # restore -
     return t[:-1] # Take off the trailing space
 
+def update_entity(vivo_entity, source_entity, key_table):
+    """
+    Given a VIVO entity and a source entity, go through the elements
+    in the key_table and update VIVO as needed.
+
+    Four actions are supported:
+
+    literal -- single valued literal.  Such as an entity label
+    resource -- single valued reference to another object.  Such as the
+        publisher of a journal
+    literal_list -- a list of literal values.  Such as phone numbers for
+        a person
+    resource_list -- a list of references to other objects.  Such as a
+        a list of references to concepts for a paper
+    """
+    entity_uri = vivo_entity['uri']
+    ardf = ""
+    srdf = ""
+    for key in key_table.keys():
+        action = key_table[key]['action']
+        if action == 'literal':
+            if key in vivo_entity:
+                vivo_value = vivo_entity[key]
+            else:
+                vivo_value = None
+            if key in source_entity:
+                source_value = source_entity[key]
+            else:
+                source_value = None
+            [add, sub] = update_data_property(entity_uri,
+                key_table[key]['predicate'], vivo_value, source_value)
+            ardf = ardf + add
+            srdf = srdf + sub
+        elif action == 'resource':
+            if key in vivo_entity:
+                vivo_value = vivo_entity[key]
+            else:
+                vivo_value = None
+            if key in source_entity:
+                source_value = source_entity[key]
+            else:
+                source_value = None
+            [add, sub] = update_resource_property(entity_uri,
+                key_table[key]['predicate'], vivo_value, source_value)
+            ardf = ardf + add
+            srdf = srdf + sub
+        elif action == 'literal_list':
+            vals = vivo_entity.get(key,[])+source_entity.get(key,[])
+            for val in vals:
+                if val in vivo_entity and val in source_entity:
+                    pass
+                elif val in vivo_entity and val not in source_entity:
+                    [add, sub] = update_data_property(entity_uri,
+                        key_table[key]['predicate'], val, None)
+                    ardf = ardf + add
+                    srdf = srdf + sub
+                else:
+                    [add, sub] = update_data_property(entity_uri,
+                        key_table[key]['predicate'], None, val)
+                    ardf = ardf + add
+                    srdf = srdf + sub
+        elif action == 'resource_list':
+            vals = vivo_entity.get(key,[])+source_entity.get(key,[])
+            for val in vals:
+                if val in vivo_entity and val in source_entity:
+                    pass
+                elif val in vivo_entity and val not in source_entity:
+                    [add, sub] = update_resource_property(entity_uri,
+                        key_table[key]['predicate'], val, None)
+                    ardf = ardf + add
+                    srdf = srdf + sub
+                else:
+                    [add, sub] = update_resource_property(entity_uri,
+                        key_table[key]['predicate'], None, val)
+                    ardf = ardf + add
+                    srdf = srdf + sub
+        else:
+            raise ActionError(action)
+    return [ardf, srdf]
+
 def assert_data_property(uri, data_property, value):
     """
     Given a uri, a data_property name, and a value, generate rdf to assert
@@ -917,7 +997,7 @@ def get_references(uri):
 
 def get_vivo_value(uri, predicate):
     """
-    Given a VIVO URI, and a predicate, get a value for the rpedicate.  Assumes
+    Given a VIVO URI, and a predicate, get a value for the predicate.  Assumes
     the result is a single valued string.
 
     Notes:

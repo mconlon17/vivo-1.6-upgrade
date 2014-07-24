@@ -23,5 +23,8 @@
     xmlns:vitro-public = "<http://vitro.mannlib.cornell.edu/ns/vitro/public#>"
     xmlns:vivo   = "<http://vivoweb.org/ontology/core#>"
     xmlns:scires = "<http://vivoweb.org/ontology/scientific-research#">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3715">
+        <rdfs:label>Conlon, Michael </rdfs:label>
+    </rdf:Description>
 
 </rdf:RDF>

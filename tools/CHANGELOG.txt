@@ -88,3 +88,5 @@ VIVO Tools Change log
 			VIVO_QUERY_URI can now be used to direct sparql queries at an
 			VIVO_URI_PREFIX is now used to indicate the URI of randomly 
 			generated uris.  Used by get_vivo_uri()
+			update_entity provides a table driven means for updating
+			attributes for any VIVO entity.

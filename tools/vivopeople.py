@@ -276,6 +276,165 @@ def improve_jobcode_description(s):
     t = t.replace(" #", "-") # restore -
     return t[:-1] # Take off the trailing space
 
+def get_telephone(telephone_uri):
+    """
+    Given the uri of a telephone number, return the uri, number and type
+    """
+    from vivofoundation import get_triples
+    telephone = {'telephone_uri':telephone_uri}
+    type = ""
+    triples = get_triples(telephone_uri)
+    try:
+        count = len(triples["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = triples["results"]["bindings"][i]
+        p = b['p']['value']
+        o = b['o']['value']
+        if p == "http://www.w3.org/2006/vcard/ns#telephone":
+            telephone['telephone_number'] = o
+        if p == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type":
+            if o.startswith('http://www.w3.org/2006/vcard'):
+                ptype = o[32:]
+                if type == "" or type == "Telephone" and ptype == "Fax" \
+                    or ptype == "Telephone":
+                    type = ptype
+        i = i + 1
+    telephone['telephone_type'] = type
+    return telephone
+
+def get_name(name_uri):
+    """
+    Given the uri of a vcard name entity, get all the data values
+    associated with the entity
+    """
+    from vivofoundation import get_triples
+    name = {'name_uri':name_uri}
+    triples = get_triples(name_uri)
+    try:
+        count = len(triples["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = triples["results"]["bindings"][i]
+        p = b['p']['value']
+        o = b['o']['value']
+        if p == "http://www.w3.org/2006/vcard/ns#givenName":
+            name['given_name'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#familyName":
+            name['family_name'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#additionalName":
+            name['additional_name'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#honorificPrefix":
+            name['name_prefix'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#honorificSuffix":
+            name['name_suffix'] = o
+        i = i + 1
+    return name
+
+def get_vcard(vcard_uri):
+    """
+    Given the uri of a vcard, get all the data values and uris associated with
+    the vcard
+    """
+    from vivofoundation import get_triples
+    from vivofoundation import get_vivo_value
+    vcard = {'vcard_uri':vcard_uri}
+    vcard['telephone_uris'] = []
+    vcard['email_uris'] = []
+    triples = get_triples(vcard_uri)
+    try:
+        count = len(triples["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = triples["results"]["bindings"][i]
+        p = b['p']['value']
+        o = b['o']['value']
+        if p == "http://www.w3.org/2006/vcard/ns#hasTitle":
+            vcard['title_uri'] = o
+        if p == "http://purl.obolibrary.org/obo/ARG_2000029":
+            vcard['person_uri'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#hasTelephone":
+            vcard['telephone_uris'].append(o)
+        if p == "http://www.w3.org/2006/vcard/ns#hasName":
+            vcard['name_uri'] = o
+        if p == "http://www.w3.org/2006/vcard/ns#hasEmail":
+            vcard['email_uris'].append(o)
+        i = i + 1
+
+    # And now deref each of the uris to get the data values.
+
+    vcard['name'] = get_name(vcard['name_uri'])
+
+    if vcard.get('title_uri', None) is not None:
+        vcard['title'] = get_vivo_value(vcard['title_uri'],'vcard:title')
+
+    vcard['telephones'] = []
+    for telephone_uri in vcard['telephone_uris']:
+        vcard['telephones'].append(get_telephone(telephone_uri))
+    del vcard['telephone_uris']
+
+    vcard['email_addresses'] = []
+    for email_uri in vcard['email_uris']:
+        vcard['email_addresses'].append({
+            'email_uri':email_uri,
+            'email_address':get_vivo_value(email_uri,
+                                              "vcard:email")
+            })
+    del vcard['email_uris']
+    return vcard
+
+def get_person(person_uri, get_contact=True):
+    """
+    Given the URI of a person in VIVO, get the poerson's attributes and
+    return a flat, keyed structure appropriate for update and other
+    applications.
+
+    To Do:
+    Add get_grants, get_papers, etc as we had previously
+    """
+    from vivofoundation import get_triples
+    person = {'person_uri': person_uri}
+    triples = get_triples(person_uri)
+    try:
+        count = len(triples["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = triples["results"]["bindings"][i]
+        p = b['p']['value']
+        o = b['o']['value']
+        if p == \
+           "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType":
+            person['person_type'] = o
+        if p == "http://purl.obolibrary.org/obo/ARG_2000028":
+            person['vcard_uri'] = o
+        if p == "http://www.w3.org/2000/01/rdf-schema#label":
+            person['display_name'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/ufid":
+            person['ufid'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/homeDept":
+            person['homedept_uri'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/privacyFlag":
+            person['privacy_flag'] = o
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink":
+            person['gatorlink'] = o
+        if p == "http://vivoweb.org/ontology/core#eRACommonsId":
+            person['eracommonsid'] = o
+        i = i + 1
+
+    # deref the vcard
+
+    if get_contact == True:
+        person['vcard'] = get_vcard(person['vcard_uri'])
+        
+    return person
 
 def get_degree(degree_uri):
     """
