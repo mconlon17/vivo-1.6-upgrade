@@ -1,0 +1,35 @@
+
+# Select attributes of person for get_person
+
+SELECT ?uri ?type ?display_name ?ufid ?privacy_flag ?gatorlink ?home_dept 
+    ?vcard_uri ?name_uri ?given_name ?famil_name ?additional_name ?name_prefix ?name_suffix
+    ?honorary_prefix ?honorary_suffix ?title_uri ?title
+    ?email_uri ?email ?telephone_uri ?telephone ?fax_uri ?fax
+WHERE {
+  ?uri a foaf:Person .
+  ?uri vitro:mostSpecificType ?type .
+  FILTER(regex(str(?type),"^http://vivo"))
+  ?uri rdfs:label ?display_name .
+  OPTIONAL { ?uri ufv:ufid ?ufid . }
+  OPTIONAL { ?uri ufv:privacyFlag ?privacy_flag . }
+  OPTIONAL { ?uri ufv:gatorlink ?gatorlink . }
+  OPTIONAL { ?uri ufv:homeDept ?home_dept .}
+  OPTIONAL {
+       ?uri obo:ARG_2000028 ?vcard_uri .
+       OPTIONAL { ?vcard_uri vcard:hasName ?name_uri .
+           OPTIONAL { ?name_uri vcard:givenName ?given_name .}
+           OPTIONAL { ?name_uri vcard:familyName ?family_name .}
+           OPTIONAL { ?name_uri vcard:additionalName ?additional_name .}
+           OPTIONAL { ?name_uri vcard:honorificPrefix ?name_prefix .}
+           OPTIONAL { ?name_uri vcard:honorificSuffix ?name_suffix .}
+       }
+       OPTIONAL { ?vcard_uri vcard:hasTitle ?title_uri . ?title_uri vcard:title ?title . }
+       OPTIONAL { ?vcard_uri vcard:hasEmail ?email_uri . ?email_uri vcard:email ?email . }
+       OPTIONAL { ?vcard_uri vcard:hasTelephone ?telephone_uri .
+                  ?telephone_uri vitro:mostSpecificType vcard:Telephone .
+                  ?telephone_uri vcard:telephone ?telephone .}
+       OPTIONAL { ?vcard_uri vcard:hasTelephone ?fax_uri .
+                  ?fax_uri vitro:mostSpecificType vcard:Fax .
+                  ?fax_uri vcard:telephone ?fax .}
+  }
+}
