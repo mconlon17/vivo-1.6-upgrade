@@ -19,9 +19,8 @@
     Current, the current HR position will be updated or added as needed.
 
     To Do:
-    Test cases for all inclusion/exclusion
-    Add UF Ontology to vagrant
-    Begin output processes
+    Add update vcard
+    Add update position
     Handle case 2 (separate program)
 
     Future enhancements:
@@ -152,7 +151,7 @@ def prepare_people(position_file_name):
         if ok_deptid(position['DEPTID'], deptid_exceptions):
             person['position_deptid'] = position['DEPTID']
             depturi = find_vivo_uri('ufv:deptID', position['DEPTID'])
-            person['position_depturi'] = depturi
+            person['position_orguri'] = depturi
             if depturi is None:
                 exc_file.write(ufid+' has deptid ' + position['DEPTID'] +\
                                ' not found.\n')
@@ -264,11 +263,11 @@ def prepare_people(position_file_name):
                 anyerrors = True
 
         if position['JOBCODE_DESCRIPTION'] != '':            
-            person['description'] = \
+            person['position_label'] = \
                 improve_jobcode_description(position['JOBCODE_DESCRIPTION'])
-            if str(person['description']) in position_exceptions:
+            if str(person['position_label']) in position_exceptions:
                 exc_file.write(ufid+' has position description '+
-                    person['description'] +\
+                    person['position_label'] +\
                     ' found in position exceptions.' +\
                     'The position will not be added.\n')
                 anyerrors = True
@@ -373,7 +372,6 @@ def add_dtv(dtv):
     date_time           datetime value
     datetime_precision  text string in tag format of VIVO date time precision,
                         example 'vivo:yearMonthDayPrecision'
-
     """
     ardf = ""
     if 'date_time' not in dtv or 'datetime_precision' not in dtv or \
@@ -439,13 +437,13 @@ def add_position(person_uri, position):
     ardf = ardf + assert_resource_property(position_uri,
             'rdf:type', position['position_type'])
     ardf = ardf + assert_resource_property(position_uri,
-            'rdfs:label', position['description'])
+            'rdfs:label', position['position_label'])
     ardf = ardf + assert_resource_property(position_uri,
             'vivo:dateTimeInterval', dti_uri)
     ardf = ardf + assert_resource_property(position_uri,
             'vivo:relates', person_uri)
     ardf = ardf + assert_resource_property(position_uri,
-            'vivo:relates', position['position_depturi'])
+            'vivo:relates', position['position_orguri'])
     
     return [ardf, position_uri]
 
@@ -499,7 +497,7 @@ def add_person(person):
     # Add Position Assertions
 
     position = {}
-    for key in ['start_date', 'description', 'end_date', 'position_depturi',
+    for key in ['start_date', 'position_label', 'end_date', 'position_orguri',
                 'position_type']:
         if key in person.keys():
             position[key] = person[key]
@@ -508,6 +506,41 @@ def add_person(person):
     ardf = ardf + add
     
     return [ardf, person_uri]
+
+def update_position(vivo_position, source_position)
+    """
+    Given a position in VIVO and a position from an authoritative source,
+    update the VIVO position to reflect the source
+    """
+    from vivofoundation import update_entity
+
+    #   Note: rank is not supported.  We do not label positions with
+    #   harvest attributes.
+    
+    update_keys = {
+        'position_label': {'predicate':'rdfs:label','action':'literal'},
+        'position_type': {'predicate':'rdf:type','action':'resource'},
+        'position_orguri': {'predicate':'vivo:relates','action':'resource'},
+        'person_uri': {'predicate':'vivo:relates','action':'resource'}
+        }
+    ardf = ""
+    srdf = ""
+    [add, sub] = update_entity(vivo_position, source_positiion, update_keys)
+    ardf = ardf + add
+    srdf = srdf + sub
+
+    #  Compare the start and end dates of vivo and source.  If not
+    #  equal, replace the vivo referent with a new datetime interval
+    #  referent.  If a datetime interval already exists in VIVO with
+    #  the same start and end values, no attempt is made to find and
+    #  reuse it.  A separate process, absolute_dates, can be used to
+    #  find and merge duplicate dates.
+
+    [add, dti_uri] = add_dti(start,end)
+    ardf = ardf + add
+    [add, sub] = update_resource_property(position_uri, 'vivo:dateTimeInterval',
+        dti_uri)
+    return [ardf, srdf]
 
 def update_person(vivo_person, source_person):
     """
@@ -527,6 +560,9 @@ def update_person(vivo_person, source_person):
     There are only 22 attributes.  How difficult could it be to update
     them in VIVO?
     """
+    from vivopeople import get_position_uris
+    from vivopeople import get_position
+    
     direct_key_table = {
     'privacy_flag': {'predicate': 'ufv:privacyFlag',
                     'action': 'literal'},
@@ -550,18 +586,19 @@ def update_person(vivo_person, source_person):
                   'primary_email',
                   'name_prefix', 'name_suffix', 'middle_name', 'fax',
                   'last_name']
-    position_keys = ['description', 'end_date', 'position_type',
-                     'position_depturi', 'start_date']
+    position_keys = ['position_label', 'end_date', 'position_type',
+                     'position_orguri', 'start_date']
     
     ardf = ""
     srdf = ""
 
-    # Update some things.  This never goes well
-    # First.  The vivo entity has to have a key value 'uri'
-    # Second.  If the source data is not an HR position, it does not
-    # have authoritative information to update the person type
+    #   Update some things.  This never goes well
+    #   First.  The vivo entity has to have a key value 'uri'
+    #   Second.  If the source data is not an HR position, it does not
+    #   have authoritative information to update the person type
 
-    vivo_person['uri'] = vivo_person['person_uri']
+    person_uri = vivo_person['uri']
+    vivo_person['uri'] = person_uri
     if source_person['hr_position'] == False:
         del direct_key_table['person_type']
 
@@ -570,9 +607,36 @@ def update_person(vivo_person, source_person):
     ardf = ardf + add
     srdf = srdf + sub
 
-    # Update vcard and its assertions
+    #   Update vcard and its assertions
 
-    # Update positions and their assertions
+
+
+
+    
+
+    #   Update position.  Examine each position.  If you find a match on
+    #   department and title, update it.  Otherwise add it.
+
+    source_position = []
+    for key in position_keys:
+        source_position = source_person[key]
+    source_position['person_uri'] = person_uri
+    print "\nPosition to update:",json.dumps(source_position, indent=4),"\n"
+    position_uris = get_position_uris(person_uri)
+    updated = False
+    for position_uri in position_uris:
+        vivo_position = get_position(position_uri)
+        if vivo_position['position_type'] == source_position['position_type'] \
+            and vivo_position['position_orguri'] == source['position_orguri']:
+            [add, sub] = update_position(vivo_position, source_position)
+            updated = True
+            ardf = ardf + add
+            srdf = srdf + sub
+            continue
+    if updated = False:
+        [add, sub] = add_position(person_uri, source_position)
+        ardf = ardf + add
+        srdf = srdf + sub
     
     return [ardf, srdf]
 

@@ -439,7 +439,7 @@ def update_resource_property(uri, resource_property, vivo_value, source_value):
         ardf = assert_resource_property(uri, resource_property, source_value)
     return [ardf, srdf]
 
-def translate_predicate(p):
+def tag_predicate(p):
     """
     Given a full URI predicate, return a tagged predicate.
     So, for example, given
@@ -451,34 +451,35 @@ def translate_predicate(p):
         rdf:type
     """
     ns = {
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf:",
-    "http://vivoweb.org/ontology/core#":"vivo:",
-    "http://vivo.ufl.edu/ontology/vivo-ufl/":"ufVivo:",
-    "http://www.w3.org/2000/01/rdf-schema#":"rdfs:",
-    "http://xmlns.com/foaf/0.1/":"foaf:",
-    "http://purl.org/ontology/bibo/":"bibo:",
-    "http://purl.org/dc/elements/1.1/":"dcelem:",
-    "http://purl.org/dc/terms/":"dcterms:",
-    "http://www.w3.org/2001/XMLSchema#":"xsd:",
-    "http://www.w3.org/2002/07/owl#":"owl:",
-    "http://www.w3.org/2003/11/swrl#":"swrl:",
-    "http://www.w3.org/2003/11/swrlb#":"swrlb:",
-    "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#":"vitro1:",
-    "http://purl.org/spar/c4o/":"c40:",
-    "http://purl.org/NET/c4dm/event.owl#":"event:",
-    "http://purl.org/spar/fabio/":"fabio:",
-    "http://aims.fao.org/aos/geopolitical.owl#":"geo:",
-    "http://vivoweb.org/ontology/provenance-support#":"pvs:",
-    "http://purl.obolibrary.org/obo/":"ero:",
-    "http://vivoweb.org/ontology/scientific-research#":"scires:",
-    "http://www.w3.org/2004/02/skos/core#":"skos:",
-    "http://vitro.mannlib.cornell.edu/ns/vitro/public#":"vitro2:"
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#":"rdf:",
+        "http://www.w3.org/2000/01/rdf-schema#":"rdfs:",
+        "http://www.w3.org/2001/XMLSchema#":"xsd:",
+        "http://www.w3.org/2002/07/owl#":"owl:",
+        "http://www.w3.org/2003/11/swrl#":"swrl:",
+        "http://www.w3.org/2003/11/swrlb#":"swrlb:",
+        "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#":"vitro:",
+        "http://purl.org/ontology/bibo/":"bibo:",
+        "http://purl.org/spar/c4o/":"c4o:",
+        "http://purl.org/spar/cito/":"cito:",
+        "http://purl.org/NET/c4dm/event.owl#":"event:",
+        "http://purl.org/spar/fabio/":"fabio:",
+        "http://xmlns.com/foaf/0.1/":"foaf:",
+        "http://aims.fao.org/aos/geopolitical.owl#":"geo:",
+        "http://purl.obolibrary.org/obo/":"obo:",
+        "http://purl.org/net/OCRe/research.owl#":"ocrer:",
+        "http://purl.org/net/OCRe/study_design.owl#":"ocresd:",
+        "http://www.w3.org/2004/02/skos/core#":"skos:",
+        "http://vivo.ufl.edu/ontology/vivo-ufl/":"ufv:",
+        "http://www.w3.org/2006/vcard/ns#":"vcard:",
+        "http://vitro.mannlib.cornell.edu/ns/vitro/public#":"vitro-public:",
+        "http://vivoweb.org/ontology/core#":"vivo:",
+        "http://vivoweb.org/ontology/scientific-research#":"scires:"
     }
     for uri, tag in ns.items():
-        if uri in p:
+        if p.find(uri) > -1:
             newp = p.replace(uri, tag)
             return newp
-    return Nonetranslate_predicate
+    return None
 
 def untag_predicate(p):
     """
@@ -1591,42 +1592,19 @@ def get_datetime_value(datetime_value_uri):
     Given a URI, return an object that contains the datetime value it
     represents
     """
+    from datetime import datetime
     datetime_value = {'datetime_value_uri':datetime_value_uri}
     triples = get_triples(datetime_value_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#dateTime":
-            datetime_value['datetime'] = o
-            year = o[0:4]
-            month = o[5:7]
-            day = o[8:10]
-        if p == "http://vivoweb.org/ontology/core#dateTimePrecision":
-            datetime_value['datetime_precision'] = o
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearPrecision":
-                datetime_value['datetime_precision'] = 'year'
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearMonthPrecision":
-                datetime_value['datetime_precision'] = 'year_month'
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearMonthDayPrecision":
-                datetime_value['datetime_precision'] = 'year_month_day'
-        if 'datetime' in datetime_value and 'datetime_precision' in \
-            datetime_value:
-            if datetime_value['datetime_precision'] == "year":
-                datetime_value['date'] = {'year':year}
-            if datetime_value['datetime_precision'] == "year_month":
-                datetime_value['date'] = {'year':year, 'month':month}
-            if datetime_value['datetime_precision'] == "year_month_day":
-                datetime_value['date'] = {'year':year, 'month':month, 'day':day}
-        i = i + 1
+    if 'results' in triples and 'bindings' in triples['results']:
+        rows = triples['results']['bindings']
+        for row in rows:
+            p = row['p']['value']
+            o = row['o']['value']
+            if p == "http://vivoweb.org/ontology/core#dateTime":
+                datetime_value['date_time'] = datetime.strptime(o,\
+                    "%Y-%m-%dT%H:%M:%S")
+            if p == "http://vivoweb.org/ontology/core#dateTimePrecision":
+                datetime_value['datetime_precision'] = tag_predicate(o)
     return datetime_value
 
 def get_datetime_interval(datetime_interval_uri):

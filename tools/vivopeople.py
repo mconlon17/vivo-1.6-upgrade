@@ -276,6 +276,36 @@ def improve_jobcode_description(s):
     t = t.replace(" #", "-") # restore -
     return t[:-1] # Take off the trailing space
 
+def get_position_uris(person_uri):
+    """
+    Given a person_uri, return a list of the position_uris for that
+    person.  If none, return an empty list
+    """
+    from vivofoundation import vivo_sparql_query
+    position_uris = []
+    query = """
+    #  Return the uri of positions for a person
+
+    SELECT ?position_uri
+      WHERE {
+        <person_uri> vivo:relatedBy ?position_uri .
+        ?position_uri rdf:type vivo:Position .
+    }
+    group by ?position_uri
+    """
+    query = query.replace('person_uri', person_uri)
+    result = vivo_sparql_query(query)
+    try:
+        count = len(result["results"]["bindings"])
+    except:
+        count = 0
+    i = 0
+    while i < count:
+        b = result["results"]["bindings"][i]
+        position_uris.append(b['position_uri']['value'])
+        i = i + 1
+    return position_uris
+
 def get_telephone(telephone_uri):
     """
     Given the uri of a telephone number, return the uri, number and type
@@ -577,6 +607,11 @@ def get_position(position_uri):
     """
     Given a URI, return an object that contains the position it represents
     """
+    from vivofoundation import get_triples
+    from vivofoundation import get_types
+    from vivofoundation import get_datetime_interval
+    from vivofoundation import untag_predicate
+    
     position = {'position_uri':position_uri} # include position_uri
     triples = get_triples(position_uri)
     try:
@@ -588,56 +623,54 @@ def get_position(position_uri):
         b = triples["results"]["bindings"][i]
         p = b['p']['value']
         o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#positionForPerson":
-            position['person_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#hrJobTitle":
+        if p == "http://vivoweb.org/ontology/core#relates":
+
+            #   deref relates.  Get the types of the referent.  If its an org,
+            #   assign the uri of the relates (o) to the org_uri of the
+            #   position.  Otherwise, assume its the person_uri
+
+            types = get_types(o)
+            if untag_predicate('foaf:Organization') in types:
+                position['position_orguri'] = o
+            else:
+                position['person_uri'] = o
+
+        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/hrJobTitle":
             position['hr_title'] = o
         if p == "http://www.w3.org/2000/01/rdf-schema#label":
             position['position_label'] = o
         if o == "http://vivoweb.org/ontology/core#FacultyPosition":
-            position['position_type'] = 'faculty'
+            position['position_type'] = o
         if o == "http://vivoweb.org/ontology/core#Non-FacultyAcademicPosition":
-            position['position_type'] = 'non-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#ClinicalFacultyPosition":
-            position['position_type'] = 'clinical-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#PostDocPosition":
-            position['position_type'] = 'post-doc'
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/ClinicalFacultyPosition":
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/PostDocPosition":
+            position['position_type'] = o
         if o == "http://vivoweb.org/ontology/core#LibrarianPosition":
-            position['position_type'] = 'librarian'
+            position['position_type'] = o
         if o == "http://vivoweb.org/ontology/core#Non-AcademicPosition":
-            position['position_type'] = 'non-academic'
-        if o == "http://vivoweb.org/ontology/ufVivo#StudentAssistant":
-            position['position_type'] = 'student-assistant'
-        if o == "http://vivoweb.org/ontology/ufVivo#GraduateAssistant":
-            position['position_type'] = 'graduate-assistant'
-        if o == "http://vivoweb.org/ontology/ufVivo#Housestaff":
-            position['position_type'] = 'housestaff'
-        if o == "http://vivoweb.org/ontology/ufVivo#TemporaryFaculty":
-            position['position_type'] = 'temp-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#Housestaff":
-            position['position_type'] = 'housestaff'
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/StudentAssistant":
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/GraduateAssistant":
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/Housestaff":
+            position['position_type'] = o
+        if o == "http://vivoweb.org/ontology/vivo-ufl/TemporaryFaculty":
+            position['position_type'] = o
         if o == \
             "http://vivoweb.org/ontology/core#FacultyAdministrativePosition":
-            position['position_type'] = 'faculty-administrative'
-
-        # deref the Organization
-
-        if p == "http://vivoweb.org/ontology/core#positionInOrganization":
-            position['org_uri'] = o
-            org = get_organization(o)
-            if 'label' in org: # org might be incomplete
-                position['org_name'] = org['label']
-
-        # deref datetime interval
-
+            position['position_type'] = o
         if p == "http://vivoweb.org/ontology/core#dateTimeInterval":
             datetime_interval = get_datetime_interval(o)
             position['datetime_interval'] = datetime_interval
             if 'start_date' in datetime_interval:
                 position['start_date'] = datetime_interval['start_date']
             if 'end_date' in datetime_interval:
-                position['end_date'] = datetime_interval['end_date']
+                position['end_date'] = datetime_interval['end_date']  
         i = i + 1
+
     return position
 
 def get_publication(publication_uri, get_authors=True):

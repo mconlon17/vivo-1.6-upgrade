@@ -1,0 +1,8 @@
+#  Return the uri of positions for a person
+
+SELECT ?position_uri
+  WHERE {
+    <http://vivo.ufl.edu/individual/n3715> vivo:relatedBy ?position_uri .
+    ?position_uri rdf:type vivo:Position .
+}
+group by ?position_uri

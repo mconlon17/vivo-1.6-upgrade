@@ -3,31 +3,26 @@
     structure representing the attributes of the position
 
     Version 0.1 MC 2013-12-27
-    --  Initial version.
+    --  Initial version
+    Version 0.2 MC 2014-07-25
+    --  Updated for Tools 2.0
 
 """
 
-__author__      = "Michael Conlon"
-__copyright__   = "Copyright 2013, University of Florida"
-__license__     = "BSD 3-Clause license"
-__version__     = "0.1"
+__author__ = "Michael Conlon"
+__copyright__ = "Copyright 2013, University of Florida"
+__license__ = "BSD 3-Clause license"
+__version__ = "0.2"
 
-import vivotools as vt
+from vivopeople import get_position
 from datetime import datetime
+import json
 
-print datetime.now(),"Start"
-positions = [
-    "http://vivo.ufl.edu/individual/n962011",
-    "http://vivo.ufl.edu/individual/n849745220",
-    "http://vivo.ufl.edu/individual/n8262508057",
-    "http://vivo.ufl.edu/individual/n950",
-    "http://vivo.ufl.edu/individual/n2417078599",
-    "http://vivo.ufl.edu/individual/n5207883537",
-    "http://vivo.ufl.edu/individual/n17281",
-    "http://vivo.ufl.edu/individual/n241190",
-    "http://vivo.ufl.edu/individual/n600567949",
-    "http://vivo.ufl.edu/individual/n2117590223"
+print datetime.now(), "Start"
+position_uris = [
+    "http://vivo.ufl.edu/individual/n7320",
+    "http://vivo.ufl.edu/individual/n6535"
     ]
-for position in positions:
-    print "\n",vt.get_position(position)
-print datetime.now(),"Finish"
+for position_uri in position_uris:
+    print "\n", json.dumps(get_position(position_uri), indent=4)
+print datetime.now(), "Finish"
