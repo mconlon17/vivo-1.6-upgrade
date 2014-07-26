@@ -48,11 +48,14 @@ from vivofoundation import untag_predicate
 from vivofoundation import assert_resource_property
 from vivofoundation import assert_data_property
 from vivofoundation import update_entity
+from vivofoundation import comma_space
 from vivopeople import get_position_type
 from vivopeople import improve_jobcode_description
 from vivopeople import repair_phone_number
 from vivopeople import repair_email
 from vivopeople import get_person
+from vivopeople import update_position
+from vivopeople import add_vcard
 from operator import itemgetter
 import codecs
 import sys
@@ -62,15 +65,6 @@ import vivofoundation as vf
 
 __harvest_text__ = "Python Person Ingest " + __version__
 __harvest_time__ = datetime.now().isoformat()
-
-def comma_space(s):
-    """
-    insert a space after every comma in s unless s ends in a comma
-    """
-    k = s.find(',')
-    if k > -1 and k < len(s)-1 and s[k+1] != " ":
-        s = s[0:k] + ', ' + comma_space(s[k+1:])
-    return s
 
 def ok_deptid(deptid, deptid_exceptions):
     """
@@ -283,144 +277,6 @@ def prepare_people(position_file_name):
     position_exceptions.close()
     return people
 
-def add_vcard(person_uri, vcard):
-    """
-    Given a person_uri and a vcard dictionary of items on the vcard,
-    generate ther RDF necessary to create the vcard, associate it with
-    the person, and associate attributes to the vcard.
-
-    The person_uri will be associated to the vcard and the vcard may have
-    any number of single entry entities to references.  The single_entry
-    table controls the processing of these entities.
-
-    The name entity is a special case. All values are attrbuted to the name
-    entity.
-
-    The single_entry table contains some additional keys for future use
-    Both the name table and the single entry table are easily extensible to
-    handle additional name attributes and additional single entry entities
-    respectively.
-    """
-    single_entry = {
-        'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
-                          'pred':'vcard:email'},
-        'email': {'resource':'vcard:hasEmail','type':'vcard:Email',
-                  'pred':'vcard:email'},
-        'fax': {'resource':'vcard:hasTelephone','type':'vcard:Fax',
-                'pred':'vcard:telephone'},
-        'telephone': {'resource':'vcard:hasTelephone','type':'vcard:Telephone',
-                      'pred':'vcard:telephone'},
-        'preferred_title': {'resource':'vcard:hasTitle','type':'vcard:Title',
-                            'pred':'vcard:title'},
-        'title': {'resource':'vcard:hasTitle','type':'vcard:Title',
-                  'pred':'vcard:title'}
-    }
-    name_table = {
-        'first_name' : 'vcard:givenName',
-        'last_name' : 'vcard:familyName',
-        'middle_name' : 'vcard:additionalName',
-        'name_prefix' : 'vcard:honoraryPrefix',
-        'name_suffix' : 'vcard:honorarySuffix'
-        }
-    ardf = ""
-    vcard_uri = get_vivo_uri()
-    ardf = ardf + assert_resource_property(vcard_uri, 'rdf:type',
-                                           untag_predicate('vcard:Individual'))
-    ardf = ardf + assert_resource_property(person_uri, 'obo:ARG2000028',
-                                           vcard_uri) # hasContactInfo
-    ardf = ardf + assert_resource_property(vcard_uri, 'obo:ARG2000029',
-                                           person_uri) # contactInfoOf
-
-    # Create the name entity and attach to vcard. For each key in the
-    # name_table, assert its value to the name entity
-
-    name_uri = get_vivo_uri()
-    ardf = ardf + assert_resource_property(name_uri, 'rdf:type',
-                                           untag_predicate('vcard:Name'))
-    ardf = ardf + assert_resource_property(vcard_uri, 'vcard:hasName',
-                                           name_uri)
-    for key in vcard.keys():
-        if key in name_table:
-            pred = name_table[key]
-            val = vcard[key]
-            ardf = ardf + assert_data_property(name_uri,
-                pred, val)            
-
-    # Process single entry vcard bits of info:
-    #   Go through the keys in the vcard.  If it's a single entry key, then
-    #   create it.  Assign the data vaue and link the vcard to the single
-    #   entry entity
-
-    for key in vcard.keys():
-        if key in single_entry:
-            val = vcard[key]
-            entry = single_entry[key]
-            entry_uri = get_vivo_uri()
-            ardf = ardf + assert_resource_property(entry_uri,
-                'rdf:type', untag_predicate(entry['type']))
-            ardf = ardf + assert_data_property(entry_uri,
-                entry['pred'], val)
-            ardf = ardf + assert_resource_property(vcard_uri,
-                entry['resource'], entry_uri)
-    return [ardf, vcard_uri]
-
-def add_dtv(dtv):
-    """
-    Given values for a date time value, generate the RDF necessary to add the
-    datetime value to VIVO
-
-    date_time           datetime value
-    datetime_precision  text string in tag format of VIVO date time precision,
-                        example 'vivo:yearMonthDayPrecision'
-    """
-    ardf = ""
-    if 'date_time' not in dtv or 'datetime_precision' not in dtv or \
-       dtv['date_time'] is None:
-        return ["", None]
-    else:
-        dtv_uri = get_vivo_uri()
-        dtv_string = dtv['date_time'].isoformat()
-        ardf = ardf + assert_resource_property(dtv_uri,
-            'rdf:type', untag_predicate('vivo:DateTimeValue'))
-        ardf = ardf + assert_data_property(dtv_uri,
-            'vivo:dateTime', dtv_string)
-        ardf = ardf + assert_resource_property(dtv_uri,
-            'vivo:dateTimePrecision', untag_predicate(dtv['datetime_precision']))
-        return [ardf, dtv_uri]
-
-def add_dti(dti):
-    """
-    Given date time interval attributes, return rdf to create the date time
-    interval
-
-    start   start date as a datetime or None or not present
-    end     start date as a datetime or None or not present
-
-    Assumes yearMonthDayPrecision for start and end
-    """
-    ardf = ""
-        
-    dtv = {'date_time' : dti.get('start',None),
-           'datetime_precision': 'vivo:yearMonthDayPrecision'}
-    [add, start_uri] = add_dtv(dtv)
-    ardf = ardf + add
-    dtv = {'date_time' : dti.get('end',None),
-           'datetime_precision': 'vivo:yearMonthDayPrecision'}
-    [add, end_uri] = add_dtv(dtv)
-    ardf = ardf + add
-    if start_uri is None and end_uri is None:
-        return ["", None]
-    else:
-        dti_uri = get_vivo_uri()
-        ardf = ardf + assert_resource_property(dti_uri,
-                'rdf:type', untag_predicate('vivo:DateTimeInterval'))
-        if start_uri is not None:
-            ardf = ardf + assert_resource_property(dti_uri,
-                    'vivo:start', start_uri)
-        if end_uri is not None:
-            ardf = ardf + assert_resource_property(dti_uri,
-                    'rdf:end', end_uri)
-        return [ardf, dti_uri]
 
 def add_position(person_uri, position):
     """
@@ -507,45 +363,10 @@ def add_person(person):
     
     return [ardf, person_uri]
 
-def update_position(vivo_position, source_position)
-    """
-    Given a position in VIVO and a position from an authoritative source,
-    update the VIVO position to reflect the source
-    """
-    from vivofoundation import update_entity
-
-    #   Note: rank is not supported.  We do not label positions with
-    #   harvest attributes.
-    
-    update_keys = {
-        'position_label': {'predicate':'rdfs:label','action':'literal'},
-        'position_type': {'predicate':'rdf:type','action':'resource'},
-        'position_orguri': {'predicate':'vivo:relates','action':'resource'},
-        'person_uri': {'predicate':'vivo:relates','action':'resource'}
-        }
-    ardf = ""
-    srdf = ""
-    [add, sub] = update_entity(vivo_position, source_positiion, update_keys)
-    ardf = ardf + add
-    srdf = srdf + sub
-
-    #  Compare the start and end dates of vivo and source.  If not
-    #  equal, replace the vivo referent with a new datetime interval
-    #  referent.  If a datetime interval already exists in VIVO with
-    #  the same start and end values, no attempt is made to find and
-    #  reuse it.  A separate process, absolute_dates, can be used to
-    #  find and merge duplicate dates.
-
-    [add, dti_uri] = add_dti(start,end)
-    ardf = ardf + add
-    [add, sub] = update_resource_property(position_uri, 'vivo:dateTimeInterval',
-        dti_uri)
-    return [ardf, srdf]
-
 def update_person(vivo_person, source_person):
     """
     Given a data structure representing a person in VIVO, and a data
-    structure rpesenting the same person with data values from source
+    structure representing the same person with data values from source
     systems, generate the ADD and SUB RDF necessary to update the VIVO
     person's data values to the corresponding values in the source
 
@@ -562,6 +383,8 @@ def update_person(vivo_person, source_person):
     """
     from vivopeople import get_position_uris
     from vivopeople import get_position
+    from vivopeople import update_position
+    from vivopeople import update_vcard
     
     direct_key_table = {
     'privacy_flag': {'predicate': 'ufv:privacyFlag',
@@ -609,15 +432,23 @@ def update_person(vivo_person, source_person):
 
     #   Update vcard and its assertions
 
-
-
-
-    
+    source_vcard = {}
+    vivo_vcard = {}
+    for key in vcard_keys:
+        source_vcard = source_person[key]
+        vivo_vcard = vivo_person[key]
+    source_vcard['person_uri'] = person_uri
+    print "\nVIVO vcard data:", json.dumps(vivo_vcard, indent=4), "\n"
+    print "\nSource vcard data:", json.dumps(source_vcard, indent=4), "\n"
+    vivo_vcard = get_vcard(vivo_person['vcard_uri'])
+    [add, sub] = update_vcard(vivo_vcard, source_vcard)
+    ardf = ardf + add
+    srdf = srdf + sub
 
     #   Update position.  Examine each position.  If you find a match on
     #   department and title, update it.  Otherwise add it.
 
-    source_position = []
+    source_position = {}
     for key in position_keys:
         source_position = source_person[key]
     source_position['person_uri'] = person_uri

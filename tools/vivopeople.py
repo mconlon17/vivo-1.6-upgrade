@@ -359,9 +359,9 @@ def get_name(name_uri):
         if p == "http://www.w3.org/2006/vcard/ns#additionalName":
             name['additional_name'] = o
         if p == "http://www.w3.org/2006/vcard/ns#honorificPrefix":
-            name['name_prefix'] = o
+            name['honorific_prefix'] = o
         if p == "http://www.w3.org/2006/vcard/ns#honorificSuffix":
-            name['name_suffix'] = o
+            name['honorific_suffix'] = o
         i = i + 1
     return name
 
@@ -512,97 +512,6 @@ def get_degree(degree_uri):
         i = i + 1
     return degree
 
-def get_role(role_uri):
-    """
-    Given a URI, return an object that contains the role it represents
-
-    To Do:
-    Generalize to more types of roles
-    """
-    role = {'role_uri':role_uri}
-    triples = get_triples(role_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#roleIn":
-            role['grant_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#roleContributesTo":
-            role['grant_uri'] = o
-        if p == 'http://vivoweb.org/ontology/core#' \
-            'co-PrincipalInvestigatorRoleOf':
-            role['co_principal_investigator_role_of'] = o
-        if p == 'http://vivoweb.org/ontology/core#' \
-            'principalInvestigatorRoleOf':
-            role['principal_investigator_role_of'] = o
-        if p == 'http://vivoweb.org/ontology/core#' \
-            'investigatorRoleOf':
-            role['investigator_role_of'] = o
-        i = i + 1
-    return role
-
-
-def get_authorship(authorship_uri):
-    """
-    Given a URI, return an object that contains the authorship it represents
-    """
-    authorship = {'authorship_uri':authorship_uri}
-    triples = get_triples(authorship_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#authorRank":
-            authorship['author_rank'] = o
-        if p == "http://vivoweb.org/ontology/core#linkedAuthor":
-            authorship['author_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#linkedInformationResource":
-            authorship['publication_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#isCorrespondingAuthor":
-            authorship['corresponding_author'] = o
-        i = i + 1
-    return authorship
-
-def get_webpage(webpage_uri):
-    """
-    Given a URI, return an object that contains the webpage it represents
-    """
-    webpage = {'webpage_uri':webpage_uri}
-    triples = get_triples(webpage_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#webpageOf":
-            webpage['webpage_of'] = o
-        if p == "http://vivoweb.org/ontology/core#rank":
-            webpage['rank'] = o
-        if p == "http://vivoweb.org/ontology/core#linkURI":
-            webpage['link_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#rank":
-            webpage['rank'] = o
-        if p == "http://vivoweb.org/ontology/core#linkAnchorText":
-            webpage['link_anchor_text'] = o
-        if o == "http://vivoweb.org/ontology/ufVivo#FullTextURI":
-            webpage['link_type'] = "full_text"
-        i = i + 1
-    return webpage
-
 def get_position(position_uri):
     """
     Given a URI, return an object that contains the position it represents
@@ -663,6 +572,7 @@ def get_position(position_uri):
             "http://vivoweb.org/ontology/core#FacultyAdministrativePosition":
             position['position_type'] = o
         if p == "http://vivoweb.org/ontology/core#dateTimeInterval":
+            position['dti_uri'] = o
             datetime_interval = get_datetime_interval(o)
             position['datetime_interval'] = datetime_interval
             if 'start_date' in datetime_interval:
@@ -673,330 +583,223 @@ def get_position(position_uri):
 
     return position
 
-def get_publication(publication_uri, get_authors=True):
+def add_vcard(person_uri, vcard):
     """
-    Given a URI, return an object that contains the publication it represents.
-    We have to dereference the publication venue to get the journal name, and
-    the datetime value to get the date of publication.
+    Given a person_uri and a vcard dictionary of items on the vcard,
+    generate ther RDF necessary to create the vcard, associate it with
+    the person, and associate attributes to the vcard.
 
-    The resulting object can be displayed using string_from_document
+    The person_uri will be associated to the vcard and the vcard may have
+    any number of single entry entities to references.  The single_entry
+    table controls the processing of these entities.
+
+    The name entity is a special case. All values are attrbuted to the name
+    entity.
+
+    The single_entry table contains some additional keys for future use
+    Both the name table and the single entry table are easily extensible to
+    handle additional name attributes and additional single entry entities
+    respectively.
     """
-    publication = {'publication_uri':publication_uri} #include the uri
-    triples = get_triples(publication_uri)
-    publication['grants_cited'] = []
-    publication['keyword_list'] = []
-    publication['concept_uris'] = []
-    publication['authorship_uris'] = []
-    publication['author_uris'] = []
-    publication['authors'] = []
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
+    
+    from vivofoundation import assert_resource_property
+    from vivofoundation import assert_data_property
+    
+    single_entry = {
+        'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                          'pred':'vcard:email'},
+        'email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                  'pred':'vcard:email'},
+        'fax': {'resource':'vcard:hasTelephone','type':'vcard:Fax',
+                'pred':'vcard:telephone'},
+        'telephone': {'resource':'vcard:hasTelephone','type':'vcard:Telephone',
+                      'pred':'vcard:telephone'},
+        'preferred_title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                            'pred':'vcard:title'},
+        'title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                  'pred':'vcard:title'}
+    }
+    name_table = {
+        'first_name' : 'vcard:givenName',
+        'last_name' : 'vcard:familyName',
+        'middle_name' : 'vcard:additionalName',
+        'name_prefix' : 'vcard:honoraryPrefix',
+        'name_suffix' : 'vcard:honorarySuffix'
+        }
+    ardf = ""
+    vcard_uri = get_vivo_uri()
+    ardf = ardf + assert_resource_property(vcard_uri, 'rdf:type',
+                                           untag_predicate('vcard:Individual'))
+    ardf = ardf + assert_resource_property(person_uri, 'obo:ARG2000028',
+                                           vcard_uri) # hasContactInfo
+    ardf = ardf + assert_resource_property(vcard_uri, 'obo:ARG2000029',
+                                           person_uri) # contactInfoOf
 
-        if p == "http://purl.org/ontology/bibo/doi":
-            publication['doi'] = o
-        if p == "http://purl.org/ontology/bibo/pmid":
-            publication['pmid'] = o
-        if p == "http://purl.org/ontology/bibo/abstract":
-            publication['abstract'] = o
-        if p == "http://vivoweb.org/ontology/core#pmcid":
-            publication['pmcid'] = o
-        if p == "http://vivoweb.org/ontology/core#nihmsid":
-            publication['nihmsid'] = o
-        if o == "http://purl.org/ontology/bibo/AcademicArticle":
-            publication['publication_type'] = 'academic-article'
-        if o == "http://purl.org/ontology/bibo/Book":
-            publication['publication_type'] = 'book'
-        if o == "http://purl.org/ontology/bibo/Chapter":
-            publication['publication_type'] = 'chapter'
-        if o == "http://vivoweb.org/ontology/core#ConferencePaper":
-            publication['publication_type'] = 'conference-paper'
-        if o == "http://vivoweb.org/ontology/core#ConferencePoster":
-            publication['publication_type'] = 'conference-poster'
-        if p == "http://vivoweb.org/ontology/core#freeTextKeyword":
-            publication['keyword_list'].append(o)
-        if p == "http://vivoweb.org/ontology/ufVivo#grantCited":
-            publication['grants_cited'].append(o)
-        if p == "http://vivoweb.org/ontology/core#hasSubjectArea":
-            publication['concept_uris'].append(o)
-        if p == \
-            "http://vivoweb.org/ontology/core#informationResourceInAuthorship":
-            publication['authorship_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#webPage":
-            publication['web_page'] = o
-        if p == "http://purl.org/ontology/bibo/pageStart":
-            publication['page_start'] = o
-        if p == "http://purl.org/ontology/bibo/pageEnd":
-            publication['page_end'] = o
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            publication['title'] = o
-        if p == "http://purl.org/ontology/bibo/volume":
-            publication['volume'] = o
-        if p == "http://purl.org/ontology/bibo/number":
-            publication['number'] = o
+    # Create the name entity and attach to vcard. For each key in the
+    # name_table, assert its value to the name entity
 
-        # deref the web page (does not handle multiple web pages)
+    name_uri = get_vivo_uri()
+    ardf = ardf + assert_resource_property(name_uri, 'rdf:type',
+                                           untag_predicate('vcard:Name'))
+    ardf = ardf + assert_resource_property(vcard_uri, 'vcard:hasName',
+                                           name_uri)
+    for key in vcard.keys():
+        if key in name_table:
+            pred = name_table[key]
+            val = vcard[key]
+            ardf = ardf + assert_data_property(name_uri,
+                pred, val)            
 
-        if p == "http://vivoweb.org/ontology/core#webPage":
-            publication['web_page'] = get_webpage(o)
-            if 'link_type' in web_page and web_page['link_type'] == \
-               'full_text_uri':
-                publication['full_text_uri'] = web_page['link_uri']
+    # Process single entry vcard bits of info:
+    #   Go through the keys in the vcard.  If it's a single entry key, then
+    #   create it.  Assign the data vaue and link the vcard to the single
+    #   entry entity
 
-        # deref the publication_venue
+    for key in vcard.keys():
+        if key in single_entry:
+            val = vcard[key]
+            entry = single_entry[key]
+            entry_uri = get_vivo_uri()
+            ardf = ardf + assert_resource_property(entry_uri,
+                'rdf:type', untag_predicate(entry['type']))
+            ardf = ardf + assert_data_property(entry_uri,
+                entry['pred'], val)
+            ardf = ardf + assert_resource_property(vcard_uri,
+                entry['resource'], entry_uri)
+    return [ardf, vcard_uri]
 
-        if p == "http://vivoweb.org/ontology/core#hasPublicationVenue":
-            publication_venue = get_publication_venue(o)
-            try:
-                publication['journal'] = publication_venue['label']
-            except:
-                pass
-
-        # deref the datetime
-
-        if p == "http://vivoweb.org/ontology/core#dateTimeValue":
-            datetime_value = get_datetime_value(o)
-            try:
-                publication['date'] = datetime_value['date']
-            except:
-                pass
-        i = i + 1
-
-    # deref the authorships
-
-    if get_authors:
-        authors = {}
-        for authorship_uri in publication['authorship_uris']:
-            authorship = get_authorship(authorship_uri)
-            if 'author_uri' in authorship:
-
-                #   Add key value which is rank.  Then string_from_document
-                #   should show in rank order.  Voila!
-                
-                author_uri = authorship['author_uri']
-                if 'author_rank' in authorship:
-                    rank = authorship['author_rank']
-                    authors[rank] = {'first':get_vivo_value(author_uri,
-                        "foaf:firstName"), 'middle':get_vivo_value(author_uri,
-                        "vivo:middleName"), 'last':get_vivo_value(author_uri,
-                        "foaf:lastName")}
-                publication['author_uris'].append(author_uri)
-        publication['authors'] = authors
-
-    return publication
-
-def get_datetime_value(datetime_value_uri):
+def update_vcard(vivo_vcard, source_vcard):
     """
-    Given a URI, return an object that contains the datetime value it
-    represents
+    Given a vivo vcard and a source vccard, generate the add and sub rdf
+    necesary to update vivo the the values ion the source
     """
-    datetime_value = {'datetime_value_uri':datetime_value_uri}
-    triples = get_triples(datetime_value_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#dateTime":
-            datetime_value['datetime'] = o
-            year = o[0:4]
-            month = o[5:7]
-            day = o[8:10]
-        if p == "http://vivoweb.org/ontology/core#dateTimePrecision":
-            datetime_value['datetime_precision'] = o
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearPrecision":
-                datetime_value['datetime_precision'] = 'year'
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearMonthPrecision":
-                datetime_value['datetime_precision'] = 'year_month'
-            if datetime_value['datetime_precision'] == \
-                "http://vivoweb.org/ontology/core#yearMonthDayPrecision":
-                datetime_value['datetime_precision'] = 'year_month_day'
-        if 'datetime' in datetime_value and 'datetime_precision' in \
-            datetime_value:
-            if datetime_value['datetime_precision'] == "year":
-                datetime_value['date'] = {'year':year}
-            if datetime_value['datetime_precision'] == "year_month":
-                datetime_value['date'] = {'year':year, 'month':month}
-            if datetime_value['datetime_precision'] == "year_month_day":
-                datetime_value['date'] = {'year':year, 'month':month, 'day':day}
-        i = i + 1
-    return datetime_value
+    
+    from vivofoundation import update_entity
+    from vivofoundation import update_data_property
+    from vivofoundation import get_vivo_uri
+    from vivofoundation import assert_data_property
+    from vivofoundation import assert_resource_property
 
-def get_datetime_interval(datetime_interval_uri):
+    ardf = ""
+    srdf = ""
+
+    # Update the name entity
+
+    name_keys = {
+        'given_name' : {'predicate':'vcard:givenName','action':'literal'},
+        'family_name' : {'predicate':'vcard:familyName',
+                       'action':'literal'},
+        'additional_name' : {'predicate':'vcard:additionalName',
+                         'action':'literal'},
+        'honorific_prefix' : {'predicate':'vcard:honorificPrefix',
+                         'action':'literal'},
+        'honorific_suffix' : {'predicate':'vcard:honorificSuffix',
+                         'action':'literal'}
+    }
+
+    # Update name entity
+    
+    if 'name' in source_vcard and 'name' not in vivo_vcard:
+        name_uri = get_vivo_uri()
+        ardf = ardf + assert_resource_property(name_uri, 'rdf:type',
+                                           untag_predicate('vcard:Name'))
+        ardf = ardf + assert_resource_property(vcard['vcard_uri'],
+            'vcard:hasName', name_uri)
+        vivo_vcard['name_uri'] = name_uri
+        vivo_vcard['name'] = {}
+    if 'name' in source_vcard:
+        vivo_vcard['name']['uri'] = vivo_vcard['name_uri']
+        [add, sub] = update_entity(vivo_vcard['name'],
+                                   source_vcard['name'], name_keys)
+        ardf = ardf + add
+        srdf = srdf + sub
+
+    #   Update title
+
+    if 'title' in source_vcard and 'title' not in vivo_vcard:
+        title_uri = get_vivo_uri()
+        ardf = ardf + assert_resource_property(title_uri, 'rdf:type',
+                                           untag_predicate('vcard:Title'))
+        ardf = ardf + assert_data_property(vivo_vcard['vcard_uri'],
+            'vcard:hasTitle', title_uri)
+        vivo_vcard['title_uri'] = title_uri
+        vivo_vcard['title'] = None
+    if 'title' in source_vcard:
+        [add, sub] = update_data_property(vivo_vcard['title_uri'],
+            'vcard:title', vivo_vcard['title'], source_vcard['title'])
+        ardf = ardf + add
+        srdf = srdf + sub
+
+    #   Update email list
+
+    #   Update telephone list
+    
+    single_entry = {
+        'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                          'pred':'vcard:email'},
+        'email': {'resource':'vcard:hasEmail','type':'vcard:Email',
+                  'pred':'vcard:email'},
+        'fax': {'resource':'vcard:hasTelephone','type':'vcard:Fax',
+                'pred':'vcard:telephone'},
+        'telephone': {'resource':'vcard:hasTelephone','type':'vcard:Telephone',
+                      'pred':'vcard:telephone'},
+        'preferred_title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                            'pred':'vcard:title'},
+        'title': {'resource':'vcard:hasTitle','type':'vcard:Title',
+                  'pred':'vcard:title'}
+    }
+##    for key in single_entry:
+##        if key in vivo_vcard and key in source_vcard:
+##            [add, sub] = update_data_property[key_uri, key_predicate,
+##                vivo_vcard[key], source_vcard[key])
+##            ardf = ardf + add
+##            srdf = srdf + sub
+
+    return [ardf, srdf]
+
+def update_position(vivo_position, source_position):
     """
-    Given a URI, return an object that contains the datetime_interval it
-    represents
+    Given a position in VIVO and a position from an authoritative source,
+    update the VIVO position to reflect the source
     """
-    datetime_interval = {'datetime_interval_uri':datetime_interval_uri}
-    triples = get_triples(datetime_interval_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#start":
-            datetime_value = get_datetime_value(o)
-            datetime_interval['start_date'] = datetime_value
-        if p == "http://vivoweb.org/ontology/core#end":
-            datetime_value = get_datetime_value(o)
-            datetime_interval['end_date'] = datetime_value
-        i = i + 1
-    return datetime_interval
+    from vivofoundation import update_entity
+    from vivofoundation import update_resource_property
+    from vivofoundation import add_dti
 
+    #   Note: We do not label positions with
+    #   harvest attributes.
+    
+    update_keys = {
+        'position_label': {'predicate':'rdfs:label','action':'literal'},
+        'position_rank': {'predicate':'vivo:rank','action':'literal'},
+        'position_type': {'predicate':'rdf:type','action':'resource'},
+        'position_orguri': {'predicate':'vivo:relates','action':'resource'},
+        'person_uri': {'predicate':'vivo:relates','action':'resource'}
+        }
+    ardf = ""
+    srdf = ""
+    [add, sub] = update_entity(vivo_position, source_position, update_keys)
+    ardf = ardf + add
+    srdf = srdf + sub
 
-def get_publication_venue(publication_venue_uri):
-    """
-    Given a URI, return an object that contains the publication venue it
-    represents
-    """
-    publication_venue = {'publication_venue_uri':publication_venue_uri}
-    triples = get_triples(publication_venue_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://purl.org/ontology/bibo/issn":
-            publication_venue['issn'] = o
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            publication_venue['label'] = o
-        i = i + 1
-    return publication_venue
+    #  Compare the start and end dates of vivo and source.  If not
+    #  equal, replace the vivo referent with a new datetime interval
+    #  referent.  If a datetime interval already exists in VIVO with
+    #  the same start and end values, no attempt is made to find and
+    #  reuse it.  A separate process, absolute_dates, can be used to
+    #  find and merge duplicate dates.
 
-def get_grant(grant_uri, get_investigators=False):
-    """
-    Given a URI, return an object that contains the grant it represents
-    """
-    grant = {'grant_uri':grant_uri}
-    grant['contributing_role_uris'] = []
-    grant['pi_uris'] = []
-    grant['coi_uris'] = []
-    grant['inv_uris'] = []
-    grant['role_uris'] = {}
-    grant['investigators'] = []
-    triples = get_triples(grant_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            grant['title'] = o
-        if p == "http://vivoweb.org/ontology/core#totalAwardAmount":
-            grant['total_award_amount'] = o
-        if p == "http://vivoweb.org/ontology/core#grantDirectCosts":
-            grant['grant_direct_costs'] = o
-        if p == "http://purl.org/ontology/bibo/abstract":
-            grant['abstract'] = o
-        if p == "http://vivoweb.org/ontology/core#sponsorAwardId":
-            grant['sponsor_award_id'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/dsrNumber":
-            grant['dsr_number'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/psContractNumber":
-            grant['pcn'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/dateHarvested":
-            grant['date_harvested'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/harvestedBy":
-            grant['harvested_by'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/localAwardId":
-            grant['local_award_id'] = o
-        if p == "http://vivoweb.org/ontology/core#contributingRole":
-            grant['contributing_role_uris'].append(o['value'])
-        
-        # deref administered by
-
-        if p == "http://vivoweb.org/ontology/core#administeredBy":
-            grant['administered_by_uri'] = o['value']
-            administered_by = get_organization(o['value'])
-            if 'label' in administered_by:
-                grant['administered_by'] = administered_by['label']
-
-        # deref awarded by
-
-        if p == "http://vivoweb.org/ontology/core#grantAwardedBy":
-            grant['sponsor_uri'] = o['value']
-            awarded_by = get_organization(o['value'])
-            if 'label' in awarded_by:
-                grant['awarded_by'] = awarded_by['label']
-
-        # deref the datetime interval
-
-        if p == "http://vivoweb.org/ontology/core#dateTimeInterval":
-            grant['dti_uri'] = o['value']
-            datetime_interval = get_datetime_interval(o['value'])
-            grant['datetime_interval'] = datetime_interval
-            if 'start_date' in datetime_interval:
-                grant['start_date'] = datetime_interval['start_date']
-            if 'end_date' in datetime_interval:
-                grant['end_date'] = datetime_interval['end_date']
-
-        i = i + 1
-
-    # deref the roles
-
-    for role_uri in grant['contributing_role_uris']:
-        role = get_role(role_uri)
-        if 'principal_investigator_role_of' in role:
-            pi_uri = role['principal_investigator_role_of']
-            if pi_uri not in grant['pi_uris']:
-                grant['pi_uris'].append(pi_uri)
-                grant['role_uris'][pi_uri] = role_uri
-        if 'co_principal_investigator_role_of' in role:
-            coi_uri = role['co_principal_investigator_role_of']
-            if coi_uri not in grant['coi_uris']:
-                grant['coi_uris'].append(coi_uri)
-                grant['role_uris'][coi_uri] = role_uri
-        if 'investigator_role_of' in role:
-            inv_uri = role['investigator_role_of']
-            if inv_uri not in grant['inv_uris']:
-                grant['inv_uris'].append(inv_uri)
-                grant['role_uris'][inv_uri] = role_uri
-
-    # deref the investigators
-
-    if get_investigators == True:
-        for role_uri in grant['contributing_role_uris']:
-            role = get_role(role_uri)
-            if 'co_principal_investigator_role_of' in role:
-                person = \
-                    get_person(role['co_principal_investigator_role_of'])
-                person['role'] = 'co_principal_investigator'
-                grant['investigators'].append(person)
-            if 'principal_investigator_role_of' in role:
-                person = \
-                    get_person(role['principal_investigator_role_of'])
-                person['role'] = 'principal_investigator'
-                grant['investigators'].append(person)
-            if 'investigator_role_of' in role:
-                person = \
-                    get_person(role['investigator_role_of'])
-                person['role'] = 'investigator'
-                grant['investigators'].append(person)
-    return grant
+    if vivo_position.get('start_date', None) != \
+       source_position.get('start_date', None) or \
+       vivo_position.get('end_date', None) != \
+       source_position.get('end_date', None):
+        [add, dti_uri] = \
+            add_dti({'start':source_position.get('start_date', None),
+                                 'end':source_position.get('end_date', None)})
+        ardf = ardf + add
+        [add, sub] = update_resource_property(vivo_position['uri'],
+            'vivo:dateTimeInterval', vivo_position.get('dti_uri',None), dti_uri)
+    return [ardf, srdf]
 
 def make_ufid_dictionary(debug=False):
     """
@@ -1039,37 +842,3 @@ def find_person(ufid, ufid_dictionary):
         uri = None
         found = False
     return [found, uri]
-
-def make_webpage_rdf(full_text_uri, \
-    uri_type="http://vivo.ufl.edu/ontology/vivo-ufl/FullTextURL", \
-    link_anchor_text="PubMed Central Full Text Link", rank="1", \
-    harvested_by="Python PubMed 1.0"):
-    """
-    Given a uri, create a web page entity with the uri, rank and
-    anchor text, harvested_by specified
-    """
-    if full_text_uri is None:
-        return ["", None]
-    full_text_url_rdf_template = tempita.Template("""
-    <rdf:Description rdf:about="{{webpage_uri}}">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#URLLink"/>
-        <rdf:type rdf:resource="{{uri_type}}"/>
-        <vivo:linkURI>{{full_text_uri}}</vivo:linkURI>
-        <vivo:rank>{{rank}}</vivo:rank>
-        <vivo:linkAnchorText>{{link_anchor_text}}</vivo:linkAnchorText>
-        <ufVivo:harvestedBy>{{harvested_by}}</ufVivo:harvestedBy>
-        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
-    </rdf:Description>
-    """)
-    webpage_uri = get_vivo_uri()
-    harvest_datetime = make_harvest_datetime()
-    rdf = full_text_url_rdf_template.substitute(webpage_uri=webpage_uri, \
-        full_text_uri=full_text_uri, \
-        rank=rank, \
-        uri_type=uri_type, \
-        link_anchor_text=link_anchor_text, \
-        harvested_by=harvested_by, \
-        harvest_datetime=harvest_datetime)
-    return [rdf, webpage_uri]
-

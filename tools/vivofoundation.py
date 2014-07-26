@@ -31,213 +31,72 @@ class UnknownDateTimePrecision(Exception):
     """
     pass
 
-def repair_phone_number(phone, debug=False):
+def comma_space(s):
     """
-    Given an arbitrary string that attempts to represent a phone number,
-    return a best attempt to format the phone number according to ITU standards
+    insert a space after every comma in s unless s ends in a comma
+    """
+    k = s.find(',')
+    if k > -1 and k < len(s)-1 and s[k+1] != " ":
+        s = s[0:k] + ', ' + comma_space(s[k+1:])
+    return s
 
-    If the phone number can not be repaired, the function reurns an empty string
+def add_dtv(dtv):
     """
-    phone_text = phone.encode('ascii', 'ignore') # encode to ascii
-    phone_text = phone_text.lower()
-    phone_text = phone_text.strip()
-    extension_digits = None
-    #
-    # strip off US international country code
-    #
-    if phone_text.find('+1 ') == 0:
-        phone_text = phone_text[3:]
-    if phone_text.find('+1-') == 0:
-        phone_text = phone_text[3:]
-    if phone_text.find('(1)') == 0:
-        phone_text = phone_text[3:]
-    digits = []
-    for c in list(phone_text):
-        if c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            digits.append(c)
-    if len(digits) > 10:
-        # pull off the extension
-        i = phone_text.rfind(' ') # last blank
-        if i > 0:
-            extension = phone_text[i+1:]
-            extension_digits = []
-            for c in list(extension):
-                if c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    extension_digits.append(c)
-            digits = [] # recalc the digits
-            for c in list(phone_text[:i+1]):
-                if c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    digits.append(c)
-        elif phone_text.rfind('x') > 0:
-            i = phone_text.rfind('x')
-            extension = phone_text[i+1:]
-            extension_digits = []
-            for c in list(extension):
-                if c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    extension_digits.append(c)
-            digits = [] # recalc the digits
-            for c in list(phone_text[:i+1]):
-                if c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    digits.append(c)
-        else:
-            extension_digits = digits[10:]
-            digits = digits[:10]
-    if len(digits) == 7:
-        if phone[0:5] == '352392':
-            updated_phone = '' # Damaged UF phone number, nothing to repair
-            extension_digits = None
-        elif phone[0:5] == '352273':
-            updated_phone = '' # Another damaged phone number, not to repair
-            extension_digits = None
-        else:
-            updated_phone = '(352) ' + "".join(digits[0:3])+'-'+ \
-                "".join(digits[3:7])
-    elif len(digits) == 10:
-        updated_phone = '('+"".join(digits[0:3])+') '+"".join(digits[3:6])+ \
-            '-'+"".join(digits[6:10])
-    elif len(digits) == 5 and digits[0] == '2': # UF special
-        updated_phone = '(352) 392' + "".join(digits[1:5])
-    elif len(digits) == 5 and digits[0] == '3': # another UF special
-        updated_phone = '(352) 273' + "".join(digits[1:5])
+    Given values for a date time value, generate the RDF necessary to add the
+    datetime value to VIVO
+
+    date_time           datetime value
+    datetime_precision  text string in tag format of VIVO date time precision,
+                        example 'vivo:yearMonthDayPrecision'
+    """
+    ardf = ""
+    if 'date_time' not in dtv or 'datetime_precision' not in dtv or \
+       dtv['date_time'] is None:
+        return ["", None]
     else:
-        updated_phone = '' # no repair
-        extension_digits = None
-    if extension_digits is not None and len(extension_digits) > 0:
-        updated_phone = updated_phone + ' ext. ' + "".join(extension_digits)
-    if debug:
-        print phone.ljust(25), updated_phone.ljust(25)
-    return updated_phone
+        dtv_uri = get_vivo_uri()
+        dtv_string = dtv['date_time'].isoformat()
+        ardf = ardf + assert_resource_property(dtv_uri,
+            'rdf:type', untag_predicate('vivo:DateTimeValue'))
+        ardf = ardf + assert_data_property(dtv_uri,
+            'vivo:dateTime', dtv_string)
+        ardf = ardf + assert_resource_property(dtv_uri,
+            'vivo:dateTimePrecision', untag_predicate(dtv['datetime_precision']))
+        return [ardf, dtv_uri]
 
-def hr_abbrev_to_words(s):
+def add_dti(dti):
     """
-    HR uses a series of abbreviations to fit job titles into limited text
-    strings.
-    Here we attempt to reverse the process -- a short title is turned into a
-    longer one
-    """
+    Given date time interval attributes, return rdf to create the date time
+    interval
 
-    s = s.lower() # convert to lower
-    s = s.title() # uppercase each word
-    s = s + ' '   # add a trailing space so we can find these abbreviated
-                  # words throughout the string
-    t = s.replace(", ,", ",")
-    t = t.replace("  ", " ")
-    t = t.replace(" & ", " and ")
-    t = t.replace(" &", " and ")
-    t = t.replace("&", " and ")
-    t = t.replace("/", " @")
-    t = t.replace("/", " @") # might be two slashes in the input
-    t = t.replace(",", " !")
-    t = t.replace("-", " #")
-    t = t.replace("Aca ", "Academic ")
-    t = t.replace("Act ", "Acting ")
-    t = t.replace("Advanc ", "Advanced ")
-    t = t.replace("Adv ", "Advisory ")
-    t = t.replace("Agric ", "Agricultural ")
-    t = t.replace("Alumn Aff ", "Alumni Affairs ")
-    t = t.replace("Ast #R ", "Research Assistant ")
-    t = t.replace("Ast #G ", "Grading Assistant ")
-    t = t.replace("Ast #T ", "Teaching Assistant ")
-    t = t.replace("Ast ", "Assistant ")
-    t = t.replace("Affl ", "Affiliate ")
-    t = t.replace("Aso ", "Associate ")
-    t = t.replace("Asoc ", "Associate ")
-    t = t.replace("Assoc ", "Associate ")
-    t = t.replace("Bio ", "Biological ")
-    t = t.replace("Prof ", "Professor ")
-    t = t.replace("Mstr ", "Master ")
-    t = t.replace("Couns ", "Counselor ")
-    t = t.replace("Adj ", "Adjunct ")
-    t = t.replace("Dist ", "Distinguished ")
-    t = t.replace("Chr ", "Chair ")
-    t = t.replace("Cio ", "Chief Information Officer ")
-    t = t.replace("Coo ", "Chief Operating Officer ")
-    t = t.replace("Coord ", "Coordinator ")
-    t = t.replace("Co ", "Courtesy ")
-    t = t.replace("Clin ", "Clinical ")
-    t = t.replace("Dn ", "Dean ")
-    t = t.replace("Finan ", "Financial ")
-    t = t.replace("Stu ", "Student ")
-    t = t.replace("Prg ", "Program ")
-    t = t.replace("Dev ", "Development ")
-    t = t.replace("Aff ", "Affiliate ")
-    t = t.replace("Svcs ", "Services ")
-    t = t.replace("Devel ", "Development ")
-    t = t.replace("Tech ", "Technician ")
-    t = t.replace("Progs ", "Programs ")
-    t = t.replace("Facil ", "Facility ")
-    t = t.replace("Hlth ", "Health ")
-    t = t.replace("Int ", "Interim ")
-    t = t.replace("Sctst ", "Scientist ")
-    t = t.replace("Supp ", "Support ")
-    t = t.replace("Cty ", "County ")
-    t = t.replace("Ext ", "Extension ")
-    t = t.replace("Emer ", "Emeritus ")
-    t = t.replace("Enforce ", "Enforcement ")
-    t = t.replace("Environ ", "Environmental ")
-    t = t.replace("Gen ", "General ")
-    t = t.replace("Jnt ", "Joint ")
-    t = t.replace("Eng ", "Engineer ")
-    t = t.replace("Ctr ", "Center ")
-    t = t.replace("Opr ", "Operator ")
-    t = t.replace("Admin ", "Administrative ")
-    t = t.replace("Dis ", "Distinguished ")
-    t = t.replace("Ser ", "Service ")
-    t = t.replace("Rep ", "Representative ")
-    t = t.replace("Radiol ", "Radiology ")
-    t = t.replace("Technol ", "Technologist ")
-    t = t.replace("Pres ", "President ")
-    t = t.replace("Pres5 ", "President 5 ")
-    t = t.replace("Pres6 ", "President 6 ")
-    t = t.replace("Emin ", "Eminent ")
-    t = t.replace("Cfo ", "Chief Financial Officer ")
-    t = t.replace("Prov ", "Provisional ")
-    t = t.replace("Adm ", "Administrator ")
-    t = t.replace("Info ", "Information ")
-    t = t.replace("It ", "Information Technology ")
-    t = t.replace("Mgr ", "Manager ")
-    t = t.replace("Mgt ", "Management ")
-    t = t.replace("Vis ", "Visiting ")
-    t = t.replace("Phas ", "Phased ")
-    t = t.replace("Prog ", "Programmer ")
-    t = t.replace("Pract ", "Practitioner ")
-    t = t.replace("Registr ", "Registration ")
-    t = t.replace("Rsch ", "Research ")
-    t = t.replace("Rsrh ", "Research ")
-    t = t.replace("Ret ", "Retirement ")
-    t = t.replace("Sch ", "School ")
-    t = t.replace("Sci ", "Scientist ")
-    t = t.replace("Svcs ", "Services ")
-    t = t.replace("Serv ", "Service ")
-    t = t.replace("Tch ", "Teaching ")
-    t = t.replace("Tele ", "Telecommunications ")
-    t = t.replace("Tv ", "TV ")
-    t = t.replace("Univ ", "University ")
-    t = t.replace("Educ ", "Education ")
-    t = t.replace("Crd ", "Coordinator ")
-    t = t.replace("Res ", "Research ")
-    t = t.replace("Dir ", "Director ")
-    t = t.replace("Pky ", "PK Yonge ")
-    t = t.replace("Rcv ", "Receiving ")
-    t = t.replace("Sr ", "Senior ")
-    t = t.replace("Spec ", "Specialist ")
-    t = t.replace("Spc ", "Specialist ")
-    t = t.replace("Spv ", "Supervisor ")
-    t = t.replace("Supv ", "Supervisor ")
-    t = t.replace("Supt ", "Superintendant ")
-    t = t.replace("Pky ", "P. K. Yonge ")
-    t = t.replace("Ii ", "II ")
-    t = t.replace("Iii ", "III ")
-    t = t.replace("Iv ", "IV ")
-    t = t.replace("Communic ", "Communications ")
-    t = t.replace("Postdoc ", "Postdoctoral ")
-    t = t.replace("Tech ", "Technician ")
-    t = t.replace("Vp ", "Vice President ")
-    t = t.replace(" @", "/") # restore /
-    t = t.replace(" @", "/")
-    t = t.replace(" !", ",") # restore ,
-    t = t.replace(" #", "-") # restore -
-    return t[:-1] # Take off the trailing space
+    start   start date as a datetime or None or not present
+    end     start date as a datetime or None or not present
+
+    Assumes yearMonthDayPrecision for start and end
+    """
+    ardf = ""
+        
+    dtv = {'date_time' : dti.get('start',None),
+           'datetime_precision': 'vivo:yearMonthDayPrecision'}
+    [add, start_uri] = add_dtv(dtv)
+    ardf = ardf + add
+    dtv = {'date_time' : dti.get('end',None),
+           'datetime_precision': 'vivo:yearMonthDayPrecision'}
+    [add, end_uri] = add_dtv(dtv)
+    ardf = ardf + add
+    if start_uri is None and end_uri is None:
+        return ["", None]
+    else:
+        dti_uri = get_vivo_uri()
+        ardf = ardf + assert_resource_property(dti_uri,
+                'rdf:type', untag_predicate('vivo:DateTimeInterval'))
+        if start_uri is not None:
+            ardf = ardf + assert_resource_property(dti_uri,
+                    'vivo:start', start_uri)
+        if end_uri is not None:
+            ardf = ardf + assert_resource_property(dti_uri,
+                    'rdf:end', end_uri)
+        return [ardf, dti_uri]
 
 def update_entity(vivo_entity, source_entity, key_table):
     """
@@ -253,6 +112,10 @@ def update_entity(vivo_entity, source_entity, key_table):
         a person
     resource_list -- a list of references to other objects.  Such as a
         a list of references to concepts for a paper
+
+    If the key is not found in the source_entity, then no change is made
+    to VIVO.  If key is found in the source entity, and the value is None
+    or an empty list, the corresponding change is made to VIVO.
     """
     entity_uri = vivo_entity['uri']
     ardf = ""
@@ -267,7 +130,7 @@ def update_entity(vivo_entity, source_entity, key_table):
             if key in source_entity:
                 source_value = source_entity[key]
             else:
-                source_value = None
+                continue # if key is not in source, do nothing
             [add, sub] = update_data_property(entity_uri,
                 key_table[key]['predicate'], vivo_value, source_value)
             ardf = ardf + add
@@ -280,12 +143,14 @@ def update_entity(vivo_entity, source_entity, key_table):
             if key in source_entity:
                 source_value = source_entity[key]
             else:
-                source_value = None
+                continue # if key is not in source, do nothing
             [add, sub] = update_resource_property(entity_uri,
                 key_table[key]['predicate'], vivo_value, source_value)
             ardf = ardf + add
             srdf = srdf + sub
         elif action == 'literal_list':
+            if key not in source_entity:
+                continue # no key => no change
             vals = vivo_entity.get(key,[])+source_entity.get(key,[])
             for val in vals:
                 if val in vivo_entity and val in source_entity:
@@ -301,6 +166,8 @@ def update_entity(vivo_entity, source_entity, key_table):
                     ardf = ardf + add
                     srdf = srdf + sub
         elif action == 'resource_list':
+            if key not in source_entity:
+                continue # no key => no change
             vals = vivo_entity.get(key,[])+source_entity.get(key,[])
             for val in vals:
                 if val in vivo_entity and val in source_entity:
@@ -603,81 +470,6 @@ def remove_uri(uri):
         srdf = srdf + sub
     return srdf
 
-
-def make_datetime_interval_rdf(start_date, end_date):
-    """
-    Given a start_date and/or end_date in isoformat, create the RDF for
-    a datetime interval
-    """
-    [start_date_rdf, start_date_uri] = make_datetime_rdf(start_date)
-    [end_date_rdf, end_date_uri] = make_datetime(end_date)
-    [datetime_interval_rdf, datetime_interval_uri] = \
-        make_dt_interval_rdf(start_date_uri, end_date_uri)
-    rdf = start_date_rdf + end_date_rdf + datetime_interval_rdf
-    return [rdf, datetime_interval_uri]
-
-def make_datetime_rdf(datetime, precision="yearMonthDay"):
-    """
-    Given a datetime string in isoformat, create the RDF for a datetime object
-    """
-    datetime_template = tempita.Template(
-    """
-    <rdf:Description rdf:about="{{datetime_uri}}">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
-        <core:dateTimePrecision rdf:resource="http://vivoweb.org/ontology/core#{{precision}}Precision"/>
-        <core:dateTime>{{datetime}}</core:dateTime>
-    </rdf:Description>
-    """)
-    if datetime == "" or datetime is None:
-        datetime_uri = None
-        rdf = ""
-    else:
-        if precision == "year" or precision == "yearMonth" or \
-            precision == "yearMonthDay":
-            datetime = datetime[0:datetime.index('T')]+"T00:00:00"
-            datetime_uri = get_vivo_uri()
-            rdf = datetime_template.substitute(datetime_uri=datetime_uri,
-                                               datetime=datetime,
-                                               precision=precision)
-        elif precision == "yearMonthDayTime":
-            print datetime
-            datetime_uri = get_vivo_uri()
-            rdf = datetime_template.substitute(datetime_uri=datetime_uri,
-                                               datetime=datetime,
-                                               precision=precision)
-        else:
-            print precision
-            raise UnknownDateTimePrecision(precision)
-    return [rdf, datetime_uri]
-
-def make_dt_interval_rdf(start_uri, end_uri):
-    """
-    Given a start and end uri, return the rdf for a datetime interval with the
-    given start and end uris. Either may be empty.
-    """
-    dt_interval_template = tempita.Template("""
-    <rdf:Description rdf:about="{{interval_uri}}">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
-        {{if start_uri != "" and start_uri is not None}}
-            <core:start rdf:resource="{{start_uri}}"/>
-        {{endif}}
-        {{if end_uri != "" and end_uri is not None}}
-            <core:end rdf:resource="{{end_uri}}"/>
-        {{endif}}
-    </rdf:Description>
-    """)
-    if (start_uri == "" or start_uri is None) and \
-        (end_uri == "" or end_uri is None):
-        rdf = ""
-        interval_uri = None
-    else:
-        interval_uri = get_vivo_uri()
-        rdf = dt_interval_template.substitute(interval_uri=interval_uri,
-                                              start_uri=start_uri,
-                                              end_uri=end_uri)
-    return [rdf, interval_uri]
 
 class UnicodeCsvReader(object):
     """
@@ -1131,139 +923,6 @@ def get_organization(organization_uri):
         i = i + 1
     return organization
 
-def get_person(person_uri, get_publications=False, get_grants=False,
-               get_positions=False, get_degrees=False):
-    """
-    Given a person URI, return an object that ccontains the person it
-    represents.
-
-    Optionally dereference publications, grants, positions, courses.  Each may
-    add significant run time
-    """
-    person = {'person_uri':person_uri}
-    person['authorship_uris'] = []
-    person['pi_role_uris'] = []
-    person['coi_role_uris'] = []
-    person['inv_role_uris'] = []
-    person['teaching_role_uris'] = []
-    person['position_uris'] = []
-    person['degree_uris'] = []
-    person['publications'] = []
-    person['grants'] = []
-    person['positions'] = []
-    person['degrees'] = []
-    triples = get_triples(person_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#primaryPhoneNumber":
-            person['primary_phone_number'] = o
-        if p == "http://vivoweb.org/ontology/core#primaryEmail":
-            person['primary_email'] = o
-        if p == "http://vivoweb.org/ontology/core#faxNumber":
-            person['fax_number'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/ufid":
-            person['ufid'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/gatorlink":
-            person['gatorlink'] = o
-        if p == "http://vivoweb.org/ontology/core#eRACommonsId":
-            person['era_commons'] = o
-        if p == "http://vivoweb.org/ontology/core#overview":
-            person['overview'] = o
-        if p == "http://xmlns.com/foaf/0.1/firstName":
-            person['first_name'] = o
-        if p == "http://xmlns.com/foaf/0.1/lastName":
-            person['last_name'] = o
-        if p == "http://vivoweb.org/ontology/core#middleName":
-            person['middle_name'] = o
-        if p == "http://purl.org/ontology/bibo#prefixName":
-            person['name_prefix'] = o
-        if p == "http://purl.org/ontology/bibo#suffixName":
-            person['name_suffix'] = o
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            person['display_name'] = o
-        if p == "http://vivoweb.org/ontology/core#preferredTitle":
-            person['preferred_title'] = o
-        if p == "http://vivoweb.org/ontology/core#faxNumber":
-            person['fax_number'] = o
-        if p == "http://vivoweb.org/ontology/core#educationalTraining":
-            person['degree_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#authorInAuthorship":
-            person['authorship_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#hasPrincipalInvestigatorRole":
-            person['pi_role_uris'].append(o)
-        if p == \
-            "http://vivoweb.org/ontology/core#hasCo-PrincipalInvestigatorRole":
-            person['coi_role_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#hasInvestigatorRole":
-            person['inv_role_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#hasTeacherRole":
-            person['teaching_role_uris'].append(o)
-        if p == "http://vivoweb.org/ontology/core#personInPosition":
-            person['position_uris'].append(o)
-
-        # deref the home department
-
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/homeDept":
-            person['home_dept_uri'] = o
-            home_department = get_organization(o)
-            if 'label' in home_department: # home department might be incomplete
-                person['home_department_name'] = home_department['label']
-        i = i + 1
-
-    # deref the authorships
-
-    if get_publications:
-        for authorship_uri in person['authorship_uris']:
-            authorship = get_authorship(authorship_uri)
-            if 'publication_uri' in authorship: # authorship might be incomplete
-                publication = get_publication(authorship['publication_uri'])
-                person['publications'].append(publication)
-
-    # deref the investigator roles
-
-    if get_grants:
-        for role_uri in person['pi_role_uris']:
-            role = get_role(role_uri)
-            if 'grant_uri' in role:  # some roles are broken
-                grant = get_grant(role['grant_uri'])
-                grant['role'] = 'pi'
-                person['grants'].append(grant)
-        for role_uri in person['coi_role_uris']:
-            role = get_role(role_uri)
-            if 'grant_uri' in role:  # some roles are broken
-                grant = get_grant(role['grant_uri'])
-                grant['role'] = 'coi'
-                person['grants'].append(grant)
-        for role_uri in person['inv_role_uris']:
-            role = get_role(role_uri)
-            if 'grant_uri' in role:  # some roles are broken
-                grant = get_grant(role['grant_uri'])
-                grant['role'] = 'inv'
-                person['grants'].append(grant)
-
-    # deref the positions
-
-    if get_positions:
-        for position_uri in person['position_uris']:
-            position = get_position(position_uri)
-            person['positions'].append(position)
-
-    # deref the degrees
-
-    if get_degrees:
-        for degree_uri in person['degree_uris']:
-            degree = get_degree(degree_uri)
-            person['degrees'].append(degree)
-
-    # deref the teaching roles
-    return person
 
 def get_degree(degree_uri):
     """
@@ -1401,73 +1060,6 @@ def get_webpage(webpage_uri):
             webpage['link_type'] = "full_text"
         i = i + 1
     return webpage
-
-def get_position(position_uri):
-    """
-    Given a URI, return an object that contains the position it represents
-    """
-    position = {'position_uri':position_uri} # include position_uri
-    triples = get_triples(position_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']['value']
-        if p == "http://vivoweb.org/ontology/core#positionForPerson":
-            position['person_uri'] = o
-        if p == "http://vivoweb.org/ontology/core#hrJobTitle":
-            position['hr_title'] = o
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            position['position_label'] = o
-        if o == "http://vivoweb.org/ontology/core#FacultyPosition":
-            position['position_type'] = 'faculty'
-        if o == "http://vivoweb.org/ontology/core#Non-FacultyAcademicPosition":
-            position['position_type'] = 'non-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#ClinicalFacultyPosition":
-            position['position_type'] = 'clinical-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#PostDocPosition":
-            position['position_type'] = 'post-doc'
-        if o == "http://vivoweb.org/ontology/core#LibrarianPosition":
-            position['position_type'] = 'librarian'
-        if o == "http://vivoweb.org/ontology/core#Non-AcademicPosition":
-            position['position_type'] = 'non-academic'
-        if o == "http://vivoweb.org/ontology/ufVivo#StudentAssistant":
-            position['position_type'] = 'student-assistant'
-        if o == "http://vivoweb.org/ontology/ufVivo#GraduateAssistant":
-            position['position_type'] = 'graduate-assistant'
-        if o == "http://vivoweb.org/ontology/ufVivo#Housestaff":
-            position['position_type'] = 'housestaff'
-        if o == "http://vivoweb.org/ontology/ufVivo#TemporaryFaculty":
-            position['position_type'] = 'temp-faculty'
-        if o == "http://vivoweb.org/ontology/ufVivo#Housestaff":
-            position['position_type'] = 'housestaff'
-        if o == \
-            "http://vivoweb.org/ontology/core#FacultyAdministrativePosition":
-            position['position_type'] = 'faculty-administrative'
-
-        # deref the Organization
-
-        if p == "http://vivoweb.org/ontology/core#positionInOrganization":
-            position['org_uri'] = o
-            org = get_organization(o)
-            if 'label' in org: # org might be incomplete
-                position['org_name'] = org['label']
-
-        # deref datetime interval
-
-        if p == "http://vivoweb.org/ontology/core#dateTimeInterval":
-            datetime_interval = get_datetime_interval(o)
-            position['datetime_interval'] = datetime_interval
-            if 'start_date' in datetime_interval:
-                position['start_date'] = datetime_interval['start_date']
-            if 'end_date' in datetime_interval:
-                position['end_date'] = datetime_interval['end_date']
-        i = i + 1
-    return position
 
 def get_publication(publication_uri, get_authors=True):
     """
@@ -1892,48 +1484,6 @@ def find_deptid(deptid, deptid_dictionary):
     return [found, uri]
 
 
-def make_ufid_dictionary(debug=False):
-    """
-    Make a dictionary for people in UF VIVO.  Key is UFID.  Value is URI.
-    """
-    query = tempita.Template("""
-    SELECT ?x ?ufid WHERE
-    {
-    ?x ufVivo:ufid ?ufid .
-    }""")
-    query = query.substitute()
-    result = vivo_sparql_query(query)
-    try:
-        count = len(result["results"]["bindings"])
-    except:
-        count = 0
-    if debug:
-        print query, count, result["results"]["bindings"][0], \
-            result["results"]["bindings"][1]
-    #
-    ufid_dictionary = {}
-    i = 0
-    while i < count:
-        b = result["results"]["bindings"][i]
-        ufid = b['ufid']['value']
-        uri = b['x']['value']
-        ufid_dictionary[ufid] = uri
-        i = i + 1
-    return ufid_dictionary
-
-def find_person(ufid, ufid_dictionary):
-    """
-    Given a UFID, and a dictionary, find the person with that UFID.  Return True
-    and URI if found. Return False and None if not found
-    """
-    try:
-        uri = ufid_dictionary[ufid]
-        found = True
-    except:
-        uri = None
-        found = False
-    return [found, uri]
-
 def make_doi_dictionary(debug=False):
     """
     Extract all the dois of documents in VIVO and organize them into a
@@ -2354,11 +1904,6 @@ def string_from_document(doc):
         s = s + ' pmcid: ' + doc['pmcid']
     return s
 
-
-def make_harvest_datetime():
-    dt = datetime.now()
-    return dt.isoformat()
-
 def update_pubmed(pub_uri, doi=None, pmid=None, inVivo=True):
     """
     Given the uri of a pub in VIVO and a module concept dictionary,
@@ -2529,53 +2074,6 @@ def update_pubmed(pub_uri, doi=None, pmid=None, inVivo=True):
         pass # Full text URI is not in VIVO and not in PubMed
 
     return [ardf, srdf]
-
-
-def vivo_find_result(type="core:Publisher", label="Humana Press", debug=False):
-    """
-    Look for entities having the specified type and the specifed label.
-    If you find any, return the json object
-    """
-    query_template = Template(
-    """
-    SELECT ?x WHERE {
-      ?x rdf:type $type .
-      ?x rdfs:label '''$label''' .
-      }
-    """
-    )
-    query = query_template.substitute(type=type, label=label)
-    if debug:
-        print query
-    result = vivo_sparql_query(query)
-    if debug:
-        print result
-    return result
-
-
-def vivo_find(type="core:Publisher", label="Humana Press", debug=False):
-    """
-    Look for entities having the specified type and the specifed label.
-    If you find any, return true (found).  Otherwise return false (not found)
-    """
-    query_template = Template(
-    """
-    SELECT COUNT(?s) WHERE {
-      ?s rdf:type $type .
-      ?s rdfs:label '''$label''' .
-      }
-    """
-    )
-    query = query_template.substitute(type=type, label=label)
-    if debug:
-        print query
-    response = vivo_sparql_query(query)
-    if debug:
-        print response
-    try:
-        return int(response["results"]["bindings"][0]['.1']['value']) != 0
-    except:
-        return False
 
 def get_vivo_uri():
     """
