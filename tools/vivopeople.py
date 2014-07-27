@@ -1,6 +1,24 @@
 #!/usr/bin/env/python
 """ vivopeople.py -- A library of useful things for working with people in VIVO
 
+    Write test scripts for:
+    
+    repair_email
+    get_position_type
+    improve_jobcode_decription
+    get_telephone
+    get_name
+    add_position
+    add_vcard
+    add_person
+    update_person
+
+    Update:
+    
+    get_degree
+    make_ufid_disctionary
+    find_person (rename find_ufid)
+    
 """
 
 __author__ = "Michael Conlon"
@@ -583,6 +601,36 @@ def get_position(position_uri):
 
     return position
 
+def add_position(person_uri, position):
+    """
+    Given a person_uri and a position dictionary containing the attributes
+    of a position, generate the RDF necessary to create the position,
+    associate it with the person and assign its attributes.
+    """
+    from vivofoundation import assert_resource_property
+    from vivofoundation import assert_data_property
+    from vivofoundation import add_dti
+    from vivofoundation import get_vivo_uri
+    
+    ardf = ""
+    position_uri = get_vivo_uri()
+    dti = {'start' : position.get('start_date',None),
+           'end': position.get('end_date',None)}
+    [add, dti_uri] = add_dti(dti)
+    ardf = ardf + add
+    ardf = ardf + assert_resource_property(position_uri,
+            'rdf:type', position['position_type'])
+    ardf = ardf + assert_resource_property(position_uri,
+            'rdfs:label', position['position_label'])
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:dateTimeInterval', dti_uri)
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:relates', person_uri)
+    ardf = ardf + assert_resource_property(position_uri,
+            'vivo:relates', position['position_orguri'])
+    
+    return [ardf, position_uri]
+
 def add_vcard(person_uri, vcard):
     """
     Given a person_uri and a vcard dictionary of items on the vcard,
@@ -604,6 +652,8 @@ def add_vcard(person_uri, vcard):
     
     from vivofoundation import assert_resource_property
     from vivofoundation import assert_data_property
+    from vivofoundation import get_vivo_uri
+    from vivofoundation import untag_predicate
     
     single_entry = {
         'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
@@ -679,6 +729,7 @@ def update_vcard(vivo_vcard, source_vcard):
     from vivofoundation import get_vivo_uri
     from vivofoundation import assert_data_property
     from vivofoundation import assert_resource_property
+    from vivofoundation import untag_predicate
 
     ardf = ""
     srdf = ""
@@ -720,7 +771,7 @@ def update_vcard(vivo_vcard, source_vcard):
         title_uri = get_vivo_uri()
         ardf = ardf + assert_resource_property(title_uri, 'rdf:type',
                                            untag_predicate('vcard:Title'))
-        ardf = ardf + assert_data_property(vivo_vcard['vcard_uri'],
+        ardf = ardf + assert_resource_property(vivo_vcard['vcard_uri'],
             'vcard:hasTitle', title_uri)
         vivo_vcard['title_uri'] = title_uri
         vivo_vcard['title'] = None
@@ -730,31 +781,75 @@ def update_vcard(vivo_vcard, source_vcard):
         ardf = ardf + add
         srdf = srdf + sub
 
-    #   Update email list
+    #   Update phone.  For now, assert a phone.  We can't seem to tell which
+    #   phone is to be "updated".  If VIVO has telephones a and b, and the
+    #   source says the phone number is c, what is the appropriate operation?
+    #   We will just pick a phone and update it to c.  If ther person has zero
+    #   or one phones, everything is fine.  These are the most likely cases.
+    #   And in the above two phone case, we have a 50-50 chance of doing the
+    #   right thing.  So perhaps 1% of people will be effected adversely by
+    #   the code that follows.
 
-    #   Update telephone list
+    if 'phone' in source_vcard and source_vcard['phone'] is not None:
+        if 'telephones' not in vivo_vcard or vivo_vcard['telephones'] == []:
+            telephone_uri = get_vivo_uri()
+            ardf = ardf + assert_resource_property(vivo_vcard['vcard_uri'],
+                'vcard:hasTelephone', telephone_uri)
+            ardf = ardf + assert_resource_property(telephone_uri,
+                'rdf:type', untag_predicate('vcard:telephone'))
+            telephone_value = None
+        else:
+            for telephone in vivo_vcard['telephones']:
+                if telephone['telephone_type'] == 'Telephone':
+                    telephone_uri = telephone['telephone_uri']
+                    telephone_value = telephone['telephone_number']
+                    continue
+        [add, sub] = update_data_property(telephone_uri,
+            'vcard:telephone', telephone_value, source_vcard['phone'])
+        ardf = ardf + add
+        srdf = srdf + sub
+
+    #   Analogous processing with analogous comments for a fax number
+
+    if 'fax' in source_vcard and source_vcard['fax'] is not None:
+        if 'telephones' not in vivo_vcard or vivo_vcard['telephones'] == []:
+            telephone_uri = get_vivo_uri()
+            ardf = ardf + assert_resource_property(vivo_vcard['vcard_uri'],
+                'vcard:hasTelephone', telephone_uri)
+            ardf = ardf + assert_resource_property(telephone_uri,
+                'rdf:type', untag_predicate('vcard:Fax'))
+            telephone_value = None
+        else:
+            for telephone in vivo_vcard['telephones']:
+                if telephone['telephone_type'] == 'Fax':
+                    telephone_uri = telephone['telephone_uri']
+                    telephone_value = telephone['telephone_number']
+                    continue
+        [add, sub] = update_data_property(telephone_uri,
+            'vcard:telephone', telephone_value, source_vcard['fax'])
+        ardf = ardf + add
+        srdf = srdf + sub
+
+    #   Analogous processing with analogous comments for an email address
+
+    if 'primary_email' in source_vcard and \
+       source_vcard['primary_email'] is not None:
+        if 'email_addresses' not in vivo_vcard or \
+           vivo_vcard['email_addresses'] == []:
+            email_uri = get_vivo_uri()
+            ardf = ardf + assert_resource_property(vivo_vcard['vcard_uri'],
+                'vcard:hasEmail', email_uri)
+            ardf = ardf + assert_resource_property(email_uri,
+                'rdf:type', untag_predicate('vcard:Email'))
+            email_value = None
+        else:
+            email_uri = email_addresses[0]['email_uri']
+            email_value = email_address[0]['email_address']
+        [add, sub] = update_data_property(email_uri,
+            'vcard:email', email_value, source_vcard['primary_email'])
+        ardf = ardf + add
+        srdf = srdf + sub
     
-    single_entry = {
-        'primary_email': {'resource':'vcard:hasEmail','type':'vcard:Email',
-                          'pred':'vcard:email'},
-        'email': {'resource':'vcard:hasEmail','type':'vcard:Email',
-                  'pred':'vcard:email'},
-        'fax': {'resource':'vcard:hasTelephone','type':'vcard:Fax',
-                'pred':'vcard:telephone'},
-        'telephone': {'resource':'vcard:hasTelephone','type':'vcard:Telephone',
-                      'pred':'vcard:telephone'},
-        'preferred_title': {'resource':'vcard:hasTitle','type':'vcard:Title',
-                            'pred':'vcard:title'},
-        'title': {'resource':'vcard:hasTitle','type':'vcard:Title',
-                  'pred':'vcard:title'}
-    }
-##    for key in single_entry:
-##        if key in vivo_vcard and key in source_vcard:
-##            [add, sub] = update_data_property[key_uri, key_predicate,
-##                vivo_vcard[key], source_vcard[key])
-##            ardf = ardf + add
-##            srdf = srdf + sub
-
     return [ardf, srdf]
 
 def update_position(vivo_position, source_position):
@@ -799,6 +894,187 @@ def update_position(vivo_position, source_position):
         ardf = ardf + add
         [add, sub] = update_resource_property(vivo_position['uri'],
             'vivo:dateTimeInterval', vivo_position.get('dti_uri',None), dti_uri)
+    return [ardf, srdf]
+
+def add_person(person):
+    """
+    Add a person to VIVO.  The person structure may have any number of
+    elements.  These elements may represent direct assertions (label,
+    ufid, homeDept), vcard assertions (contact info, name parts),
+    and/or position assertions (title, tye, dept, start, end dates)
+    """
+    from vivofoundation import assert_data_property
+    from vivofoundation import assert_resource_property
+    from vivofoundation import untag_predicate
+    from vivofoundation import get_vivo_uri
+    
+    ardf = ""
+    person_uri = get_vivo_uri()
+
+    # Add direct assertions
+
+    person_type = person['person_type']
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type', person_type)
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
+                        untag_predicate('ufv:UFEntity'))
+    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
+                        untag_predicate('ufv:UFCurrentEntity'))
+
+    direct_data_preds = {'ufid':'ufv:ufid',
+                         'privacy_flag':'ufv:privacyFlag',
+                         'display_name':'rdfs:label',
+                         'gatorlink':'ufv:gatorlink'
+                         }
+    direct_resource_preds = {'homedept_uri':'ufv:homeDept'}
+    for key in direct_data_preds:
+        if key in person:
+            pred = direct_data_preds[key]
+            val = person[key]
+            ardf = ardf + assert_data_property(person_uri, pred, val)
+    for key in direct_resource_preds:
+        if key in person:
+            pred = direct_resource_preds[key]
+            val = person[key]
+            ardf = ardf + assert_resource_property(person_uri, pred, val)
+
+    # Add Vcard Assertions
+
+    vcard = {}
+    for key in ['last_name', 'first_name', 'middle_name', 'primary_email',
+                'name_prefix', 'name_suffix', 'fax', 'phone', 'preferred_title',
+                ]:
+        if key in person.keys():
+            vcard[key] = person[key]
+    [add, vcard_uri] = add_vcard(person_uri, vcard)
+    ardf = ardf + add
+
+    # Add Position Assertions
+
+    position = {}
+    for key in ['start_date', 'position_label', 'end_date', 'position_orguri',
+                'position_type']:
+        if key in person.keys():
+            position[key] = person[key]
+
+    [add, position_uri] = add_position(person_uri, position)
+    ardf = ardf + add
+    
+    return [ardf, person_uri]
+
+def update_person(vivo_person, source_person):
+    """
+    Given a data structure representing a person in VIVO, and a data
+    structure representing the same person with data values from source
+    systems, generate the ADD and SUB RDF necessary to update the VIVO
+    person's data values to the corresponding values in the source
+
+    These data structures are NOT comparable.  The VIVO data structure is the
+    structure returned by get_person and reflects the hieriarchical and
+    repeating nature of data in VIVO.  The source data structure is flat,
+    representing the single-valued input file
+
+    Key values are grouped into three sets -- direct (attributes of the
+    person directly), vcard attributes and position attributes
+
+    There are only 22 attributes.  How difficult could it be to update
+    them in VIVO?
+    """
+    from vivopeople import get_position_uris
+    from vivopeople import get_position
+    from vivopeople import update_position
+    from vivopeople import update_vcard
+    from vivofoundation import update_entity
+    import json
+    
+    direct_key_table = {
+    'privacy_flag': {'predicate': 'ufv:privacyFlag',
+                    'action': 'literal'},
+    'homedept_uri': {'predicate': 'ufv:homeDept',
+                    'action': 'resource'},
+    'display_name': {'predicate': 'rdfs:label',
+                    'action': 'literal'},
+    'ufid': {'predicate': 'ufv:ufid',
+                    'action': 'literal'},
+    'gatorlink': {'predicate': 'ufv:gatorlink',
+                    'action': 'literal'},
+    'person_type': {'predicate': 'rdf:type',
+                    'action': 'literal'},
+    'date_harvested': {'predicate': 'ufv:dateHarvested',
+                    'action': 'literal'},
+    'harvested_by': {'predicate': 'ufv:harvestedBy',
+                    'action': 'literal'}
+    }
+
+    vcard_names = ['given_name', 'honorfic_prefix', 'honorific_suffix',
+                   'additional_name', 'family_name']
+    vcard_flat = ['fax',  'phone', 'title']
+    position_keys = ['position_label', 'end_date', 'position_type',
+                     'position_orguri', 'start_date']
+    
+    ardf = ""
+    srdf = ""
+
+    #   Update some things.  This never goes well
+    #   First.  The vivo entity has to have a key value 'uri'
+    #   Second.  If the source data is not an HR position, it does not
+    #   have authoritative information to update the person type
+
+    person_uri = vivo_person['person_uri']
+    vivo_person['uri'] = person_uri
+    if source_person['hr_position'] == False:
+        del direct_key_table['person_type']
+
+    [add, sub] = update_entity(vivo_person, source_person, \
+                               direct_key_table)
+    ardf = ardf + add
+    srdf = srdf + sub
+
+    #   Update vcard and its assertions
+
+    vivo_vcard = vivo_person['vcard']
+    source_vcard = {'name':{}}
+    source_vcard['person_uri'] = person_uri
+    for key in vcard_names:
+        if key in source_person:
+            source_vcard['name'][key] = source_person[key]
+    for key in vcard_flat:
+        if key in source_person:
+            source_vcard[key] = source_person[key]
+
+    print "VIVO Vcard:\n",json.dumps(vivo_vcard, indent=4)
+    print "Source Vcard:\n",json.dumps(source_vcard, indent=4)
+    
+    [add, sub] = update_vcard(vivo_vcard, source_vcard)
+    ardf = ardf + add
+    srdf = srdf + sub
+
+    #   Update position.  Examine each position.  If you find a match on
+    #   department and title, update it.  Otherwise add it.
+
+    source_position = {}
+    for key in position_keys:
+        source_position[key] = source_person[key]
+    source_position['person_uri'] = person_uri
+    position_uris = get_position_uris(person_uri)
+    updated = False
+    for position_uri in position_uris:
+        vivo_position = get_position(position_uri)
+        print "\nVIVO position",vivo_position
+        print "\nSource position",source_position
+        if vivo_position.get('position_type',None) == \
+           source_position.get('position_type',None) \
+            and vivo_position.get('position_orguri',None) == \
+            source_position.get('position_orguri',None):
+            [add, sub] = update_position(vivo_position, source_position)
+            updated = True
+            ardf = ardf + add
+            srdf = srdf + sub
+            continue
+    if updated == False:
+        [add, sub] = add_position(person_uri, source_position)
+        ardf = ardf + add
+        srdf = srdf + sub
+    
     return [ardf, srdf]
 
 def make_ufid_dictionary(debug=False):

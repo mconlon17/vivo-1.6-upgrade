@@ -19,9 +19,8 @@
     Current, the current HR position will be updated or added as needed.
 
     To Do:
-    Add update vcard
-    Add update position
-    Handle case 2 (separate program)
+    Handle case 2 -- updating current and UF entity designation -- in a separate
+    program
 
     Future enhancements:
      -- For case 2, close end dates for positions with explicit HR data rather
@@ -38,25 +37,14 @@ __copyright__ = "Copyright 2014, University of Florida"
 __license__ = "BSD 3-Clause license"
 __version__ = "2.00"
 
-from datetime import datetime
 from vivofoundation import rdf_header
 from vivofoundation import rdf_footer
-from vivofoundation import find_vivo_uri
-from vivofoundation import get_vivo_uri
-from vivofoundation import read_csv
-from vivofoundation import untag_predicate
-from vivofoundation import assert_resource_property
-from vivofoundation import assert_data_property
-from vivofoundation import update_entity
-from vivofoundation import comma_space
-from vivopeople import get_position_type
-from vivopeople import improve_jobcode_description
-from vivopeople import repair_phone_number
-from vivopeople import repair_email
+
 from vivopeople import get_person
-from vivopeople import update_position
-from vivopeople import add_vcard
-from operator import itemgetter
+from vivopeople import add_person
+from vivopeople import update_person
+
+from datetime import datetime
 import codecs
 import sys
 import os
@@ -106,6 +94,17 @@ def prepare_people(position_file_name):
     -- a shelve of URI that will not be touched in VIVO
     """
     import shelve
+    from vivofoundation import read_csv
+    from vivofoundation import find_vivo_uri
+    from vivofoundation import get_vivo_uri
+    from vivofoundation import untag_predicate
+    from vivofoundation import comma_space
+    from vivopeople import improve_jobcode_description
+    from vivopeople import get_position_type
+    from vivopeople import repair_phone_number
+    from vivopeople import repair_email
+    from operator import itemgetter
+    
     person_type_table = {
         'faculty':'vivo:FacultyMember',
         'postdoc':'vivo:Postdoc',
@@ -187,19 +186,19 @@ def prepare_people(position_file_name):
             info = contact[ufid]
 
             if info['FIRST_NAME'].title() != '':
-                person['first_name'] = info['FIRST_NAME'].title()
+                person['given_name'] = info['FIRST_NAME'].title()
 
             if info['LAST_NAME'].title() != '':
-                person['last_name'] = info['LAST_NAME'].title()
+                person['family_name'] = info['LAST_NAME'].title()
 
             if info['MIDDLE_NAME'].title() != '':
-                person['middle_name'] = info['MIDDLE_NAME'].title()
+                person['additional_name'] = info['MIDDLE_NAME'].title()
 
             if info['NAME_SUFFIX'].title() != '':
-                person['name_suffix'] = info['NAME_SUFFIX'].title()
+                person['honorific_suffix'] = info['NAME_SUFFIX'].title()
 
             if info['NAME_PREFIX'].title() != '':
-                person['name_prefix'] = info['NAME_PREFIX'].title()
+                person['honorific_prefix'] = info['NAME_PREFIX'].title()
 
             if info['DISPLAY_NAME'] != '':
                 person['display_name'] = comma_space(info['DISPLAY_NAME'].\
@@ -210,7 +209,7 @@ def prepare_people(position_file_name):
 
             if info['WORKINGTITLE'] != '':
                 if info['WORKINGTITLE'].upper() == info['WORKINGTITLE']:
-                    person['preferred_title'] = \
+                    person['title'] = \
                         improve_jobcode_description(\
                             position['JOBCODE_DESCRIPTION'])
                 else:
@@ -277,202 +276,9 @@ def prepare_people(position_file_name):
     position_exceptions.close()
     return people
 
-
-def add_position(person_uri, position):
-    """
-    Given a person_uri and a position dictionary containing the attributes
-    of a position, generate the RDF necessary to create the position,
-    associate it with the person and assign its attributes.
-    """
-    ardf = ""
-    position_uri = get_vivo_uri()
-    dti = {'start' : position.get('start_date',None),
-           'end': position.get('end_date',None)}
-    [add, dti_uri] = add_dti(dti)
-    ardf = ardf + add
-    ardf = ardf + assert_resource_property(position_uri,
-            'rdf:type', position['position_type'])
-    ardf = ardf + assert_resource_property(position_uri,
-            'rdfs:label', position['position_label'])
-    ardf = ardf + assert_resource_property(position_uri,
-            'vivo:dateTimeInterval', dti_uri)
-    ardf = ardf + assert_resource_property(position_uri,
-            'vivo:relates', person_uri)
-    ardf = ardf + assert_resource_property(position_uri,
-            'vivo:relates', position['position_orguri'])
-    
-    return [ardf, position_uri]
-
-def add_person(person):
-    """
-    Add a person to VIVO.  The person structure may have any number of
-    elements.  These elements may represent direct assertions (label,
-    ufid, homeDept), vcard assertions (contact info, name parts),
-    and/or position assertions (title, tye, dept, start, end dates)
-    """
-    ardf = ""
-    person_uri = get_vivo_uri()
-
-    # Add direct assertions
-
-    person_type = person['person_type']
-    ardf = ardf + assert_resource_property(person_uri, 'rdf:type', person_type)
-    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
-                        untag_predicate('ufv:UFEntity'))
-    ardf = ardf + assert_resource_property(person_uri, 'rdf:type',
-                        untag_predicate('ufv:UFCurrentEntity'))
-
-    direct_data_preds = {'ufid':'ufv:ufid',
-                         'privacy_flag':'ufv:privacyFlag',
-                         'display_name':'rdfs:label',
-                         'gatorlink':'ufv:gatorlink'
-                         }
-    direct_resource_preds = {'homedept_uri':'ufv:homeDept'}
-    for key in direct_data_preds:
-        if key in person:
-            pred = direct_data_preds[key]
-            val = person[key]
-            ardf = ardf + assert_data_property(person_uri, pred, val)
-    for key in direct_resource_preds:
-        if key in person:
-            pred = direct_resource_preds[key]
-            val = person[key]
-            ardf = ardf + assert_resource_property(person_uri, pred, val)
-
-    # Add Vcard Assertions
-
-    vcard = {}
-    for key in ['last_name', 'first_name', 'middle_name', 'primary_email',
-                'name_prefix', 'name_suffix', 'fax', 'phone', 'preferred_title',
-                ]:
-        if key in person.keys():
-            vcard[key] = person[key]
-    [add, vcard_uri] = add_vcard(person_uri, vcard)
-    ardf = ardf + add
-
-    # Add Position Assertions
-
-    position = {}
-    for key in ['start_date', 'position_label', 'end_date', 'position_orguri',
-                'position_type']:
-        if key in person.keys():
-            position[key] = person[key]
-
-    [add, position_uri] = add_position(person_uri, position)
-    ardf = ardf + add
-    
-    return [ardf, person_uri]
-
-def update_person(vivo_person, source_person):
-    """
-    Given a data structure representing a person in VIVO, and a data
-    structure representing the same person with data values from source
-    systems, generate the ADD and SUB RDF necessary to update the VIVO
-    person's data values to the corresponding values in the source
-
-    These data structures are NOT comparable.  The VIVO data structure is the
-    structure returned by get_person and reflects the hieriarchical and
-    repeating nature of data in VIVO.  The source data structure is flat,
-    representing the single-valued input file
-
-    Key values are grouped into three sets -- direct (attributes of the
-    person directly), vcard attributes and position attributes
-
-    There are only 22 attributes.  How difficult could it be to update
-    them in VIVO?
-    """
-    from vivopeople import get_position_uris
-    from vivopeople import get_position
-    from vivopeople import update_position
-    from vivopeople import update_vcard
-    
-    direct_key_table = {
-    'privacy_flag': {'predicate': 'ufv:privacyFlag',
-                    'action': 'literal'},
-    'homedept_uri': {'predicate': 'ufv:homeDept',
-                    'action': 'resource'},
-    'display_name': {'predicate': 'rdfs:label',
-                    'action': 'literal'},
-    'ufid': {'predicate': 'ufv:ufid',
-                    'action': 'literal'},
-    'gatorlink': {'predicate': 'ufv:gatorlink',
-                    'action': 'literal'},
-    'person_type': {'predicate': 'rdf:type',
-                    'action': 'literal'},
-    'date_harvested': {'predicate': 'ufv:dateHarvested',
-                    'action': 'literal'},
-    'harvested_by': {'predicate': 'ufv:harvestedBy',
-                    'action': 'literal'}
-    }
-
-    vcard_keys = ['phone', 'preferred_title', 'first_name',
-                  'primary_email',
-                  'name_prefix', 'name_suffix', 'middle_name', 'fax',
-                  'last_name']
-    position_keys = ['position_label', 'end_date', 'position_type',
-                     'position_orguri', 'start_date']
-    
-    ardf = ""
-    srdf = ""
-
-    #   Update some things.  This never goes well
-    #   First.  The vivo entity has to have a key value 'uri'
-    #   Second.  If the source data is not an HR position, it does not
-    #   have authoritative information to update the person type
-
-    person_uri = vivo_person['uri']
-    vivo_person['uri'] = person_uri
-    if source_person['hr_position'] == False:
-        del direct_key_table['person_type']
-
-    [add, sub] = update_entity(vivo_person, source_person, \
-                               direct_key_table)
-    ardf = ardf + add
-    srdf = srdf + sub
-
-    #   Update vcard and its assertions
-
-    source_vcard = {}
-    vivo_vcard = {}
-    for key in vcard_keys:
-        source_vcard = source_person[key]
-        vivo_vcard = vivo_person[key]
-    source_vcard['person_uri'] = person_uri
-    print "\nVIVO vcard data:", json.dumps(vivo_vcard, indent=4), "\n"
-    print "\nSource vcard data:", json.dumps(source_vcard, indent=4), "\n"
-    vivo_vcard = get_vcard(vivo_person['vcard_uri'])
-    [add, sub] = update_vcard(vivo_vcard, source_vcard)
-    ardf = ardf + add
-    srdf = srdf + sub
-
-    #   Update position.  Examine each position.  If you find a match on
-    #   department and title, update it.  Otherwise add it.
-
-    source_position = {}
-    for key in position_keys:
-        source_position = source_person[key]
-    source_position['person_uri'] = person_uri
-    print "\nPosition to update:",json.dumps(source_position, indent=4),"\n"
-    position_uris = get_position_uris(person_uri)
-    updated = False
-    for position_uri in position_uris:
-        vivo_position = get_position(position_uri)
-        if vivo_position['position_type'] == source_position['position_type'] \
-            and vivo_position['position_orguri'] == source['position_orguri']:
-            [add, sub] = update_position(vivo_position, source_position)
-            updated = True
-            ardf = ardf + add
-            srdf = srdf + sub
-            continue
-    if updated = False:
-        [add, sub] = add_position(person_uri, source_position)
-        ardf = ardf + add
-        srdf = srdf + sub
-    
-    return [ardf, srdf]
-
 # Start here
 
+debug = True
 if len(sys.argv) > 1:
     input_file_name = str(sys.argv[1])
 else:
@@ -504,29 +310,26 @@ print >>log_file, datetime.now(), "Position data has", len(people),\
 
 for source_person in people.values():
 
-    print
-    print "Consider"
-    print
-    view_person = dict(source_person)
-    if view_person.get('end_date',None) is not None:
-        view_person['end_date'] = view_person['end_date'].isoformat()
-    if view_person.get('start_date',None) is not None:
-        view_person['start_date'] = view_person['start_date'].isoformat()       
-    print json.dumps(view_person, indent=4)
+    if debug:
+        print
+        print "Consider"
+        print
+        view_person = dict(source_person)
+        if view_person.get('end_date',None) is not None:
+            view_person['end_date'] = view_person['end_date'].isoformat()
+        if view_person.get('start_date',None) is not None:
+            view_person['start_date'] = view_person['start_date'].isoformat()       
+        print json.dumps(view_person, indent=4)
     
     if 'uri' in source_person and source_person['uri'] is not None:
         print >>log_file, "Updating person at", source_person['uri']
         vivo_person = get_person(source_person['uri'])
-        print "\nGet_person results:"
-        print json.dumps(vivo_person, indent=4)
-        print
         [add, sub] = update_person(vivo_person, source_person)
         ardf = ardf + add
         srdf = srdf + sub
     else:
         print >>log_file, "Adding person", source_person['ufid']
         [add, person_uri] = add_person(source_person)
-        vivo_person = {'uri': person_uri}
         ardf = ardf + add
 
 adrf = ardf + rdf_footer()

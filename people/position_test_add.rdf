@@ -23,190 +23,160 @@
     xmlns:vitro-public = "<http://vitro.mannlib.cornell.edu/ns/vitro/public#>"
     xmlns:vivo   = "<http://vivoweb.org/ontology/core#>"
     xmlns:scires = "<http://vivoweb.org/ontology/scientific-research#">
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <rdf:type rdf:resource="http://vivoweb.org/ontology/core#CourtesyFaculty"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFCurrentEntity"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <ufv:privacyFlag>N</ufv:privacyFlag>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <ufv:gatorlink>afh4000</ufv:gatorlink>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <rdfs:label>Hakeem, Abdulaziz</rdfs:label>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <ufv:ufid>84957104</ufv:ufid>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
         <ufv:homeDept rdf:resource="http://vivo.ufl.edu/individual/n5706"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2814042585">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n479140576">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Individual"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8754571049">
-        <obo:ARG2000028 rdf:resource="http://vivo.ufl.edu/individual/n2814042585"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7281682346">
+        <obo:ARG2000028 rdf:resource="http://vivo.ufl.edu/individual/n479140576"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2814042585">
-        <obo:ARG2000029 rdf:resource="http://vivo.ufl.edu/individual/n8754571049"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n479140576">
+        <obo:ARG2000029 rdf:resource="http://vivo.ufl.edu/individual/n7281682346"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3341855379">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n5742591167">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Name"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2814042585">
-        <vcard:hasName rdf:resource="http://vivo.ufl.edu/individual/n3341855379"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n479140576">
+        <vcard:hasName rdf:resource="http://vivo.ufl.edu/individual/n5742591167"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3341855379">
-        <vcard:givenName>Abdulaziz</vcard:givenName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3341855379">
-        <vcard:familyName>Hakeem</vcard:familyName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3341855379">
-        <vcard:additionalName>F</vcard:additionalName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9506677178">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2960176230">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Email"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9506677178">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2960176230">
         <vcard:email>AHakeem@dental.ufl.edu</vcard:email>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2814042585">
-        <vcard:hasEmail rdf:resource="http://vivo.ufl.edu/individual/n9506677178"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n479140576">
+        <vcard:hasEmail rdf:resource="http://vivo.ufl.edu/individual/n2960176230"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4936840662">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2667569960">
         <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4936840662">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2667569960">
         <vivo:dateTime>2013-07-01T00:00:00</vivo:dateTime>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4936840662">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2667569960">
         <vivo:dateTimePrecision rdf:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3352854084">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1648496107">
         <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3352854084">
-        <vivo:start rdf:resource="http://vivo.ufl.edu/individual/n4936840662"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1648496107">
+        <vivo:start rdf:resource="http://vivo.ufl.edu/individual/n2667569960"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9931596850">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n993256891">
         <rdf:type rdf:resource="courtesy-faculty"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9931596850">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n993256891">
         <rdfs:label rdf:resource="Courtesy Clinical Postdoctoral Associate"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9931596850">
-        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n3352854084"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n993256891">
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n1648496107"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9931596850">
-        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n8754571049"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n993256891">
+        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n7281682346"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9931596850">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n993256891">
         <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n5706"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/TemporaryFaculty"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFCurrentEntity"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <ufv:privacyFlag>N</ufv:privacyFlag>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <ufv:gatorlink>gbin</ufv:gatorlink>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <rdfs:label>Binczik, Gerald A</rdfs:label>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <ufv:ufid>80104480</ufv:ufid>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
         <ufv:homeDept rdf:resource="http://vivo.ufl.edu/individual/n4656"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7899744480">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7880281773">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Individual"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3147985634">
-        <obo:ARG2000028 rdf:resource="http://vivo.ufl.edu/individual/n7899744480"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4197988476">
+        <obo:ARG2000028 rdf:resource="http://vivo.ufl.edu/individual/n7880281773"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7899744480">
-        <obo:ARG2000029 rdf:resource="http://vivo.ufl.edu/individual/n3147985634"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7880281773">
+        <obo:ARG2000029 rdf:resource="http://vivo.ufl.edu/individual/n4197988476"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n515162710">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n908243871">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Name"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7899744480">
-        <vcard:hasName rdf:resource="http://vivo.ufl.edu/individual/n515162710"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7880281773">
+        <vcard:hasName rdf:resource="http://vivo.ufl.edu/individual/n908243871"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n515162710">
-        <vcard:givenName>Gerald</vcard:givenName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n515162710">
-        <vcard:familyName>Binczik</vcard:familyName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n515162710">
-        <vcard:additionalName>A</vcard:additionalName>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n515162710">
-        <vcard:honoraryPrefix>Mr</vcard:honoraryPrefix>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3240418847">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n956325195">
         <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Email"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3240418847">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n956325195">
         <vcard:email>gbin@ufl.edu</vcard:email>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7899744480">
-        <vcard:hasEmail rdf:resource="http://vivo.ufl.edu/individual/n3240418847"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7880281773">
+        <vcard:hasEmail rdf:resource="http://vivo.ufl.edu/individual/n956325195"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9188592298">
-        <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Title"/>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n9188592298">
-        <vcard:title>Adjunct Professor</vcard:title>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7899744480">
-        <vcard:hasTitle rdf:resource="http://vivo.ufl.edu/individual/n9188592298"/>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2920504570">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4227957957">
         <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2920504570">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4227957957">
         <vivo:dateTime>2006-11-17T00:00:00</vivo:dateTime>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2920504570">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4227957957">
         <vivo:dateTimePrecision rdf:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1231665944">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4711953100">
         <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1231665944">
-        <vivo:start rdf:resource="http://vivo.ufl.edu/individual/n2920504570"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4711953100">
+        <vivo:start rdf:resource="http://vivo.ufl.edu/individual/n4227957957"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4610401899">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6242354313">
         <rdf:type rdf:resource="temp-faculty"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4610401899">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6242354313">
         <rdfs:label rdf:resource="Adjunct Professor"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4610401899">
-        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n1231665944"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6242354313">
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n4711953100"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4610401899">
-        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n3147985634"/>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6242354313">
+        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n4197988476"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4610401899">
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6242354313">
         <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n4656"/>
     </rdf:Description>
     <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3715">
@@ -216,7 +186,52 @@
         <rdfs:label>Conlon, Mike</rdfs:label>
     </rdf:Description>
     <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3715">
-        <ufv:dateHarvested>2014-07-24T18:02:36.734000</ufv:dateHarvested>
+        <ufv:dateHarvested>2014-07-27T15:28:02.435000</ufv:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n4506">
+        <vcard:telephone>(352) 273-8872</vcard:telephone>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2960709038">
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2960709038">
+        <vivo:dateTime>2013-07-21T00:00:00</vivo:dateTime>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2960709038">
+        <vivo:dateTimePrecision rdf:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6357951060">
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6357951060">
+        <vivo:dateTime>2014-07-21T00:00:00</vivo:dateTime>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6357951060">
+        <vivo:dateTimePrecision rdf:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n777099959">
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n777099959">
+        <vivo:start rdf:resource="http://vivo.ufl.edu/individual/n2960709038"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n777099959">
+        <rdf:end rdf:resource="http://vivo.ufl.edu/individual/n6357951060"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6492311362">
+        <rdf:type rdf:resource=""/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6492311362">
+        <rdfs:label rdf:resource="Secim P&O Core Director"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6492311362">
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n777099959"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6492311362">
+        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n3715"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6492311362">
+        <vivo:relates rdf:resource="http://vivo.ufl.edu/individual/n2003"/>
     </rdf:Description>
 
 </rdf:RDF>
