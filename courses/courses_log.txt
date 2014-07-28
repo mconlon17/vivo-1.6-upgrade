@@ -1,0 +1,18 @@
+2014-06-23 14:04:59.688000 Course ingest. Version 0.5 VIVOTools 1.58
+2014-06-23 14:04:59.688000 Make UF Taught Dictionary
+2014-06-23 14:04:59.693000 Taught dictionary has  4  entries
+2014-06-23 14:04:59.693000 Make VIVO Term Dictionary
+2014-06-23 14:04:59.899000 VIVO Term dictionary has  39  entries
+2014-06-23 14:04:59.899000 Make VIVO Course Dictionary
+2014-06-23 14:05:07.971000 VIVO Course dictionary has  8051  entries
+2014-06-23 14:05:07.971000 Make VIVO Section Dictionary
+2014-06-23 14:06:18.349000 VIVO Section dictionary has  87268  entries
+2014-06-23 14:06:18.349000 Make VIVO UFID Dictionary
+2014-06-23 14:06:26.703000 VIVO UFID dictionary has  37540  entries
+2014-06-23 14:06:26.703000 Begin Processing
+Add section SLS2302 Spring 2013 0871 at http://vivo.ufl.edu/individual/n6037144127
+Add section SLS2301 Spring 2013 087H at http://vivo.ufl.edu/individual/n1901762355
+Add course CAP9940 Sas Research Mgmt at http://vivo.ufl.edu/individual/n3518712465
+Add section CAP9940 Summer 2013 087H at http://vivo.ufl.edu/individual/n1969210560
+Add section CAP9940 Fall 2013 087H at http://vivo.ufl.edu/individual/n7669553612
+2014-06-23 14:06:28.532000 End Processing

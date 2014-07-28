@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+    xmlns:rdf     = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs    = "http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd     = "http://www.w3.org/2001/XMLSchema#"
+    xmlns:owl     = "http://www.w3.org/2002/07/owl#"
+    xmlns:swrl    = "http://www.w3.org/2003/11/swrl#"
+    xmlns:swrlb   = "http://www.w3.org/2003/11/swrlb#"
+    xmlns:vitro1  = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
+    xmlns:bibo    = "http://purl.org/ontology/bibo/"
+    xmlns:c4o     = "http://purl.org/spar/c4o/"
+    xmlns:dcelem  = "http://purl.org/dc/elements/1.1/"
+    xmlns:dcterms = "http://purl.org/dc/terms/"
+    xmlns:event   = "http://purl.org/NET/c4dm/event.owl#"
+    xmlns:foaf    = "http://xmlns.com/foaf/0.1/"
+    xmlns:fabio   = "http://purl.org/spar/fabio/"
+    xmlns:geo     = "http://aims.fao.org/aos/geopolitical.owl#"
+    xmlns:pvs     = "http://vivoweb.org/ontology/provenance-support#"
+    xmlns:ero     = "http://purl.obolibrary.org/obo/"
+    xmlns:scires  = "http://vivoweb.org/ontology/scientific-research#"
+    xmlns:skos    = "http://www.w3.org/2004/02/skos/core#"
+    xmlns:ufVivo  = "http://vivo.ufl.edu/ontology/vivo-ufl/"
+    xmlns:vitro2  = "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
+    xmlns:core    = "http://vivoweb.org/ontology/core#"
+    xmlns:vivo    = "http://vivoweb.org/ontology/core#">
+
+
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6037144127">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        <rdfs:label>SLS2302 Spring 2013 0871</rdfs:label>
+        <ufVivo:sectionNum>0871</ufVivo:sectionNum>
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n22047"/>
+        <ufVivo:sectionForCourse rdf:resource="http://vivo.ufl.edu/individual/n1429637390"/>
+        <ufVivo:harvestedBy>Python Courses version 0.5</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>2014-06-23T14:06:27.078000</ufVivo:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n22047">
+        <ufVivo:dateTimeIntervalFor rdf:resource="http://vivo.ufl.edu/individual/n6037144127"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n6270447632">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#TeacherRole"/>
+        <vivo:teacherRoleOf rdf:resource="http://vivo.ufl.edu/individual/n471979474"/>
+        <vivo:roleRealizedIn rdf:resource="http://vivo.ufl.edu/individual/n6037144127"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1901762355">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        <rdfs:label>SLS2301 Spring 2013 087H</rdfs:label>
+        <ufVivo:sectionNum>087H</ufVivo:sectionNum>
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n22047"/>
+        <ufVivo:sectionForCourse rdf:resource="http://vivo.ufl.edu/individual/n825489148"/>
+        <ufVivo:harvestedBy>Python Courses version 0.5</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>2014-06-23T14:06:27.540000</ufVivo:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n22047">
+        <ufVivo:dateTimeIntervalFor rdf:resource="http://vivo.ufl.edu/individual/n1901762355"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n8242848343">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#TeacherRole"/>
+        <vivo:teacherRoleOf rdf:resource="http://vivo.ufl.edu/individual/n471979474"/>
+        <vivo:roleRealizedIn rdf:resource="http://vivo.ufl.edu/individual/n1901762355"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n3518712465">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/Course"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        <rdfs:label>CAP9940 Sas Research Mgmt</rdfs:label>
+        <ufVivo:courseNum>CAP9940</ufVivo:courseNum>
+        <ufVivo:harvestedBy>Python Courses version 0.5</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>2014-06-23T14:06:27.693000</ufVivo:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n1969210560">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        <rdfs:label>CAP9940 Summer 2013 087H</rdfs:label>
+        <ufVivo:sectionNum>087H</ufVivo:sectionNum>
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n171999"/>
+        <ufVivo:sectionForCourse rdf:resource="http://vivo.ufl.edu/individual/n3518712465"/>
+        <ufVivo:harvestedBy>Python Courses version 0.5</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>2014-06-23T14:06:28.063000</ufVivo:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n171999">
+        <ufVivo:dateTimeIntervalFor rdf:resource="http://vivo.ufl.edu/individual/n1969210560"/>
+    </rdf:Description>
+        <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n5199400416">
+            <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+            <rdf:type rdf:resource="http://vivoweb.org/ontology/core#TeacherRole"/>
+            <rdfs:label>CAP9940 Sas Research Mgmt</rdfs:label>
+            <ufVivo:courseRoleOf rdf:resource="http://vivo.ufl.edu/individual/n25562"/>
+            <vivo:roleRealizedIn rdf:resource="http://vivo.ufl.edu/individual/n3518712465"/>        
+        </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n758672595">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#TeacherRole"/>
+        <vivo:teacherRoleOf rdf:resource="http://vivo.ufl.edu/individual/n25562"/>
+        <vivo:roleRealizedIn rdf:resource="http://vivo.ufl.edu/individual/n1969210560"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n7669553612">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/CourseSection"/>
+        <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        <rdfs:label>CAP9940 Fall 2013 087H</rdfs:label>
+        <ufVivo:sectionNum>087H</ufVivo:sectionNum>
+        <vivo:dateTimeInterval rdf:resource="http://vivo.ufl.edu/individual/n120066"/>
+        <ufVivo:sectionForCourse rdf:resource="http://vivo.ufl.edu/individual/n3518712465"/>
+        <ufVivo:harvestedBy>Python Courses version 0.5</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>2014-06-23T14:06:28.511000</ufVivo:dateHarvested>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n120066">
+        <ufVivo:dateTimeIntervalFor rdf:resource="http://vivo.ufl.edu/individual/n7669553612"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vivo.ufl.edu/individual/n2626784493">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#TeacherRole"/>
+        <vivo:teacherRoleOf rdf:resource="http://vivo.ufl.edu/individual/n25562"/>
+        <vivo:roleRealizedIn rdf:resource="http://vivo.ufl.edu/individual/n7669553612"/>
+    </rdf:Description>
+</rdf:RDF>
+
