@@ -40,6 +40,30 @@ def comma_space(s):
         s = s[0:k] + ', ' + comma_space(s[k+1:])
     return s
 
+def make_datetime_rdf(value, title):
+    """
+    Given a bibtex publication value, create the RDF for a datetime object
+    expressing the date of publication
+    """
+    datetime_template = tempita.Template(
+    """
+    <rdf:Description rdf:about="{{uri}}">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+        <core:dateTimePrecision rdf:resource=vivo:yearMonthPrecision"/>
+        <core:dateTime>{{pub_datetime}}</core:dateTime>
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+    uri = vivotools.get_vivo_uri()
+    pub_datetime = make_pub_datetime(value)
+    harvest_datetime = vivotools.make_harvest_datetime()
+    rdf = "<!-- Timestamp RDF for " + title + "-->"
+    rdf = rdf + datetime_template.substitute(uri=uri,\
+        pub_datetime=pub_datetime, harvest_datetime=harvest_datetime)
+    return [rdf, uri]
+
 def add_dtv(dtv):
     """
     Given values for a date time value, generate the RDF necessary to add the
@@ -961,149 +985,6 @@ def get_datetime_interval(datetime_interval_uri):
     return datetime_interval
 
 
-def get_grant(grant_uri, get_investigators=False):
-    """
-    Given a URI, return an object that contains the grant it represents
-    """
-    grant = {'grant_uri':grant_uri}
-    grant['contributing_role_uris'] = []
-    grant['pi_uris'] = []
-    grant['coi_uris'] = []
-    grant['inv_uris'] = []
-    grant['role_uris'] = {}
-    grant['investigators'] = []
-    triples = get_triples(grant_uri)
-    try:
-        count = len(triples["results"]["bindings"])
-    except:
-        count = 0
-    i = 0
-    while i < count:
-        b = triples["results"]["bindings"][i]
-        p = b['p']['value']
-        o = b['o']
-        if p == "http://www.w3.org/2000/01/rdf-schema#label":
-            grant['title'] = o
-        if p == "http://vivoweb.org/ontology/core#totalAwardAmount":
-            grant['total_award_amount'] = o
-        if p == "http://vivoweb.org/ontology/core#grantDirectCosts":
-            grant['grant_direct_costs'] = o
-        if p == "http://purl.org/ontology/bibo/abstract":
-            grant['abstract'] = o
-        if p == "http://vivoweb.org/ontology/core#sponsorAwardId":
-            grant['sponsor_award_id'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/dsrNumber":
-            grant['dsr_number'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/psContractNumber":
-            grant['pcn'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/dateHarvested":
-            grant['date_harvested'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/harvestedBy":
-            grant['harvested_by'] = o
-        if p == "http://vivo.ufl.edu/ontology/vivo-ufl/localAwardId":
-            grant['local_award_id'] = o
-        if p == "http://vivoweb.org/ontology/core#contributingRole":
-            grant['contributing_role_uris'].append(o['value'])
-        
-        # deref administered by
-
-        if p == "http://vivoweb.org/ontology/core#administeredBy":
-            grant['administered_by_uri'] = o['value']
-            administered_by = get_organization(o['value'])
-            if 'label' in administered_by:
-                grant['administered_by'] = administered_by['label']
-
-        # deref awarded by
-
-        if p == "http://vivoweb.org/ontology/core#grantAwardedBy":
-            grant['sponsor_uri'] = o['value']
-            awarded_by = get_organization(o['value'])
-            if 'label' in awarded_by:
-                grant['awarded_by'] = awarded_by['label']
-
-        # deref the datetime interval
-
-        if p == "http://vivoweb.org/ontology/core#dateTimeInterval":
-            grant['dti_uri'] = o['value']
-            datetime_interval = get_datetime_interval(o['value'])
-            grant['datetime_interval'] = datetime_interval
-            if 'start_date' in datetime_interval:
-                grant['start_date'] = datetime_interval['start_date']
-            if 'end_date' in datetime_interval:
-                grant['end_date'] = datetime_interval['end_date']
-
-        i = i + 1
-
-    # deref the roles
-
-    for role_uri in grant['contributing_role_uris']:
-        role = get_role(role_uri)
-        if 'principal_investigator_role_of' in role:
-            pi_uri = role['principal_investigator_role_of']
-            if pi_uri not in grant['pi_uris']:
-                grant['pi_uris'].append(pi_uri)
-                grant['role_uris'][pi_uri] = role_uri
-        if 'co_principal_investigator_role_of' in role:
-            coi_uri = role['co_principal_investigator_role_of']
-            if coi_uri not in grant['coi_uris']:
-                grant['coi_uris'].append(coi_uri)
-                grant['role_uris'][coi_uri] = role_uri
-        if 'investigator_role_of' in role:
-            inv_uri = role['investigator_role_of']
-            if inv_uri not in grant['inv_uris']:
-                grant['inv_uris'].append(inv_uri)
-                grant['role_uris'][inv_uri] = role_uri
-
-    # deref the investigators
-
-    if get_investigators == True:
-        for role_uri in grant['contributing_role_uris']:
-            role = get_role(role_uri)
-            if 'co_principal_investigator_role_of' in role:
-                person = \
-                    get_person(role['co_principal_investigator_role_of'])
-                person['role'] = 'co_principal_investigator'
-                grant['investigators'].append(person)
-            if 'principal_investigator_role_of' in role:
-                person = \
-                    get_person(role['principal_investigator_role_of'])
-                person['role'] = 'principal_investigator'
-                grant['investigators'].append(person)
-            if 'investigator_role_of' in role:
-                person = \
-                    get_person(role['investigator_role_of'])
-                person['role'] = 'investigator'
-                grant['investigators'].append(person)
-    return grant
-
-def string_from_grant(grant):
-    """
-    Given a grant object, return a string representing the grant
-
-    To Do
-    Need the PI and the dates
-    """
-    s = ""
-    if 'awarded_by' in grant:
-        s = s + grant['awarded_by'] + '\n'
-    if 'sponsor_award_id' in grant:
-        s = s + grant['sponsor_award_id']
-    if 'pi_name' in grant:
-        s = s + '          ' + grant['pi_name']
-    if 'award_amount' in grant:
-        s = s + ' $' + grant['award_amount']
-    if 'start_date' in grant:
-        s = s + '          ' + grant['start_date']['date']['month'] + '/' + \
-            grant['start_date']['date']['day'] + '/' + \
-            grant['start_date']['date']['year']
-    if 'end_date' in grant:
-        s = s + ' - ' + grant['end_date']['date']['month'] + '/' + \
-            grant['end_date']['date']['day'] + '/' + \
-            grant['end_date']['date']['year']
-    if 'title' in grant:
-        s = s + '\n' + grant['title']
-    return s
-
 def make_concept_dictionary(debug=False):
     """
     Make a dictionary for concepts in UF VIVO.  Key is label.  Value is URI.
@@ -1234,6 +1115,71 @@ def make_date_dictionary(datetime_precision="vivo:yearMonthDayPrecision",
         date_dictionary[dtv] = uri
         i = i + 1
     return date_dictionary
+
+def make_datetime_interval_dictionary(debug=False):
+    """
+    Make a dictionary for datetime intervals in UF VIVO.
+    Key is concatenation of start and end uris.  Value is URI.
+    """
+    query = tempita.Template("""
+    SELECT ?uri ?starturi ?enduri
+    WHERE
+    {
+        ?uri vivo:end ?enduri .
+        ?uri vivo:start ?starturi .
+    }
+    """)
+    query = query.substitute()
+    result = vt.vivo_sparql_query(query)
+    try:
+        count = len(result["results"]["bindings"])
+    except:
+        count = 0
+    if debug:
+        print query, count, result["results"]["bindings"][0], \
+            result["results"]["bindings"][1]
+    #
+    datetime_interval_dictionary = {}
+    i = 0
+    while i < count:
+        b = result["results"]["bindings"][i]
+        uri = b['uri']['value']
+        if 'starturi' in b:
+            start_uri = b['starturi']['value']
+        else:
+            start_uri = "None"
+        if 'enduri' in b:
+            end_uri = b['enduri']['value']
+        else:
+            end_uri = "None"
+        key = start_uri+end_uri
+        datetime_interval_dictionary[key] = uri
+        i = i + 1
+    return datetime_interval_dictionary
+
+def find_datetime_interval(start_uri, end_uri, datetime_dictionary):
+    """
+    Given start and end uris for dates, find an interval with that pair of
+    dates, find the org with that sponsor.  Return True and URI
+    Return false and None if not found
+    """
+    if start_uri == None or start_uri == "":
+        start_key = "None"
+    else:
+        start_key = start_uri
+
+    if end_uri == None or end_uri == "":
+        end_key = "None"
+    else:
+        end_key = end_uri
+
+    try:
+        uri = datetime_interval_dictionary[start_key+end_key]
+        found = True
+    except:
+        uri = None
+        found = False
+    return [found, uri]
 
 def make_webpage_rdf(full_text_uri, \
     uri_type="http://vivo.ufl.edu/ontology/vivo-ufl/FullTextURL", \

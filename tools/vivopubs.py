@@ -9,6 +9,1072 @@ __copyright__ = "Copyright 2014, University of Florida"
 __license__ = "BSD 3-Clause license"
 __version__ = "2.00"
 
+def abbrev_to_words(s):
+    """
+    Text is often abbreviated in the names of publishers and journals.
+    This helper function takes a string s and returns an improved version
+    with abbreviations replaced by words.  Handle cosmetic improvements.
+    Replace special characters with escape versions for RDF
+    """
+    t = s.replace("Dept ", "Department ")
+    t = t.replace("Soc ", "Society ")
+    t = t.replace("Med ", "Medical ")
+    t = t.replace("Natl ", "National ")
+    t = t.replace("Univ ", "University ")
+    t = t.replace("Publ ", "Publishers ")
+    t = t.replace("Am ", "American ")
+    t = t.replace("Assoc ", "Association ")
+    t = t.replace("Acad ", "Academy ")
+    t = t.replace("Of ", "of ")
+    t = t.replace("In ", "in ")
+    t = t.replace("As ", "as ")
+    t = t.replace("Ieee ", "IEEE ")
+    t = t.replace("A ", "a ")
+    t = t.replace("For ", "for ")
+    t = t.replace("And ", "and ")
+    t = t.replace("The ", "the ")
+    t = t.replace("Inst ", "Institute ")
+    t = t.replace("Sci ", "Science ")
+    t = t.replace("Amer ", "American ")
+    t = t.replace("'S ", "'s ")
+    t = t.replace("Ii ", "II ")
+    t = t.replace("Iii ", "III ")
+    t = t.replace("Iv ", "IV ")
+    t = t.replace("\&", "&amp;")
+    t = t.replace("<", "&lt;")
+    t = t.replace(">", "&gt;")
+
+    # Returned value will always start with an upper case letter
+
+    t = t[0].upper() + t[1:]
+    return t
+
+def make_journal_uri(value):
+    """
+    Given a bibtex publication value, return the journal uri from VIVO.
+    Three cases:  1) There is no journal name in the bibtex.  We return
+    an empty URI.  2) We find the journal in VIVO, we return the
+    URI of the journal in VIVO. 3) We don't find the journal, so we
+    return a new URI.
+    """
+
+    # get the name of the journal from the data.  Fix it up a bit before
+    # trying to find
+
+    try:
+        journal_name = value.fields['journal'].title()+ " "
+        journal_name = abbrev_to_words(journal_name)
+        journal_name = journal_name[0:-1]
+        issn = value.fields['issn']
+        document['journal'] = journal_name
+        document['issn'] = issn
+    except:
+        journal_uri = ""
+        journal_name = "No Journal"
+        create = False
+        return [create, journal_name, journal_uri]
+
+    # now we are ready to look for the journal -- first in the
+    # journal_report (journals we have already
+    # processed in this run, and if not found there, then in the journal
+    # dictionary created from VIVO
+
+    if journal_name in journal_report:
+        create = False
+        journal_uri = journal_report[journal_name][1]
+        journal_report[journal_name][2] = journal_report[journal_name][2] + 1
+    else:
+        [found, uri] = vivotools.find_journal(issn, journal_dictionary)
+        if not found:
+
+            # Will need to create
+
+            create = True
+            journal_uri = vivotools.get_vivo_uri()
+        else:
+
+            # Found in VIVO
+
+            create = False
+            journal_uri = uri
+        journal_report[journal_name] = [create, journal_uri, 1]
+
+    return [create, journal_name, journal_uri]
+
+def make_publisher_rdf(value):
+    """
+    Given a bibtex publication value, create the RDF for a publisher
+    """
+    publisher_template = tempita.Template(
+    """
+    <rdf:Description rdf:about="{{uri}}">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>{{publisher}}</rdfs:label>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#Publisher"/>
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+
+    # get the name of the publisher from the data.  Fix it up a bit
+    # before trying to find
+
+    try:
+        publisher = value.fields['publisher'].title() + " "
+        publisher = abbrev_to_words(publisher)
+        publisher = publisher[0:-1]
+    except:
+        uri = ""
+        publisher = "No publisher"
+        create = False
+        rdf = "\n<!-- No publisher found for this publication." +\
+            " No RDF necessary -->"
+        return [create, publisher, uri, rdf]
+
+    #  now we are ready to look for the publisher
+
+    if publisher in publisher_report:
+        create = False
+        uri = publisher_report[publisher][1]
+        publisher_report[publisher][2] = \
+            publisher_report[publisher][2] + 1
+        rdf = "\n<!-- " + publisher + " found at uri to be created " +\
+            uri + "  No RDF necessary -->"
+    else:
+        [found, uri] = vivotools.find_publisher(publisher,\
+            publisher_dictionary)
+        if not found:
+
+            # Publisher not found.  We need to add one.
+
+            create = True
+            uri = vivotools.get_vivo_uri()
+            harvest_datetime = vivotools.make_harvest_datetime()
+            rdf = "\n<!-- Publisher RDF for " + publisher + " -->"
+            rdf = rdf + publisher_template.substitute(uri=uri,\
+                publisher=publisher, harvest_datetime=harvest_datetime)
+            publisher_report[publisher] = [create, uri, 1]
+        else:
+
+            # Publisher found.  return the uri of the publisher
+
+            create = False
+            rdf = "\n<!-- " + publisher + " found in VIVO at uri " +\
+                uri + "  No RDF necessary -->"
+            publisher_report[publisher] = [create, uri, 1]
+    return [create, publisher, uri, rdf]
+
+def make_journal_rdf(value, journal_create, journal_name, journal_uri):
+    """
+    Given a bibtex publication value, create the RDF for the journal of
+    the journal of the publication if the journal is not already in VIVO
+    """
+    journal_template = tempita.Template(
+    """
+    <rdf:Description rdf:about="{{journal_uri}}">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>{{journal_name}}</rdfs:label>
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Journal"/>
+        {{if len(issn) > 0 :}}
+            <bibo:issn>{{issn}}</bibo:issn>
+        {{endif}}
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+    if not journal_create:
+        rdf = "\n<!-- " + journal_name + " found at uri " +\
+            journal_uri + "  No RDF necessary -->"
+    else:
+
+        # Not found. get the issn of the journal
+
+        try:
+            issn = value.fields['issn']
+        except:
+            issn = ""
+        harvest_datetime = vivotools.make_harvest_datetime()
+        rdf = "\n<!-- Journal RDF for " + journal_name + " -->"
+        rdf = rdf + journal_template.substitute(journal_uri=journal_uri,\
+            journal_name=journal_name, issn=issn,\
+            harvest_datetime=harvest_datetime)
+    return [rdf, journal_uri]
+
+def make_publisher_journal_rdf(publisher_uri, journal_uri):
+    """
+    Create the assertions PublisherOf and PublishedBy between a
+    publisher and a journal
+    """
+    publisher_journal_template = tempita.Template("""
+    <rdf:Description rdf:about="{{publisher_uri}}">
+        <core:publisherOf  rdf:resource="{{journal_uri}}"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="{{journal_uri}}">
+        <core:publisher rdf:resource="{{publisher_uri}}"/>
+    </rdf:Description>
+    """)
+    rdf = ""
+    harvest_datetime = vivotools.make_harvest_datetime()
+    rdf = rdf + "\n<!-- Publisher/Journal assertions for " + publisher +\
+        " and " + journal_name + " -->"
+    rdf = rdf + publisher_journal_template.substitute(\
+        publisher_uri=publisher_uri, journal_uri=journal_uri,
+        harvest_datetime=harvest_datetime)
+    return rdf
+
+def name_parts(author):
+    """
+    Given the name of an author, break it in to first, middle, last and assign a
+    case number to the type of name information we have
+
+    Case 0 last name only
+    Case 1 last name, first initial
+    Case 2 last name, first name
+    Case 3 last name, first initial, middle initial
+    Case 4 last name, first initial, middle name
+    Case 5 last name, first name, middle initial
+    Case 6 last name, first name, middle name
+    """
+    name_cut = author.split(',')
+    last = name_cut[0]
+    if len(name_cut) > 1:
+        rest = name_cut[1]
+        rest = rest.replace(',', '')
+        rest = rest.replace('.', '')
+        name_list = rest.split()
+        name_list.insert(0, last)
+    else:
+        name_list = [last]
+    if len(name_list) >= 3:
+        last = name_list[0]
+        first = name_list[1]
+        middle = name_list[2]
+        if len(first) == 1 and len(middle) == 1:
+            case = 3
+        if len(first) == 1 and len(middle) > 1:
+            case = 4
+        if len(first) > 1 and len(middle) == 1:
+            case = 5
+        if len(first) > 1 and len(middle) > 1:
+            case = 6
+    elif len(name_list) == 2:
+        last = name_list[0]
+        first = name_list[1]
+        middle = ""
+        if len(first) == 1:
+            case = 1
+        if len(first) > 1:
+            case = 2
+    else:
+        last = name_list[0]
+        first = ""
+        middle = ""
+        case = 0
+    result = [last, first, middle, case]
+    return result
+
+def update_dict(dict, key, val):
+    """
+    return a list of the results of dict[key] with val appended
+    """
+    try:
+        l = dict[key]
+    except:
+        l = []
+    l.append(val)
+    return l
+
+def make_people_dictionaries(debug=False):
+    """
+    Get all the UFEntity people from VIVO and build seven dictionaries:
+    put each person in as many dictionaries as they can be (between 1
+    and 7) based on the presence of their name parts in VIVO.  A last
+    name part is required to be in the SPARQL result set.
+    """
+    query = tempita.Template("""
+    SELECT ?x ?fname ?lname ?mname WHERE
+    {
+    ?x rdf:type foaf:Person .
+    ?x foaf:lastName ?lname .
+    ?x rdf:type ufVivo:UFEntity .
+    OPTIONAL {?x core:middleName ?mname .}
+    OPTIONAL {?x foaf:firstName ?fname .}
+    }""")
+    query = query.substitute()
+    result = vivotools.vivo_sparql_query(query)
+    try:
+        count = len(result["results"]["bindings"])
+    except:
+        count = 0
+    if debug:
+        print query, count, result["results"]["bindings"][0],\
+            result["results"]["bindings"][1]
+
+    # make the dictionaries
+    #
+    # Case 0 last name only
+    # Case 1 last name, first initial
+    # Case 2 last name, first name
+    # Case 3 last name, first initial, middle initial
+    # Case 4 last name, first initial, middle name
+    # Case 5 last name, first name, middle initial
+    # Case 6 last name, first name, middle name
+
+    case0_dict = {}
+    case1_dict = {}
+    case2_dict = {}
+    case3_dict = {}
+    case4_dict = {}
+    case5_dict = {}
+    case6_dict = {}
+    i = 0
+    while i < count:
+        b = result["results"]["bindings"][i]
+        lname = b['lname']['value']
+        uri = b['x']['value']
+        try:
+            fname = b['fname']['value']
+        except:
+            fname = ""
+        try:
+            mname = b['mname']['value']
+        except:
+            mname = ""
+        if len(fname) > 0 and len(mname) > 0:
+
+            # seven cases here
+
+            k0 = vivotools.key_string(lname)
+            k1 = vivotools.key_string(lname + ':' + fname[0])
+            k2 = vivotools.key_string(lname + ':' + fname)
+            k3 = vivotools.key_string(lname + ':' + fname[0] +\
+                ':' + mname[0])
+            k4 = vivotools.key_string(lname + ':' + fname[0] +\
+                ':' + mname)
+            k5 = vivotools.key_string(lname + ':' + fname + ':' +\
+                mname[0])
+            k6 = vivotools.key_string(lname + ':' + fname + ':' +\
+                mname)
+            case0_dict[k0] = update_dict(case0_dict, k0, uri)
+            case1_dict[k1] = update_dict(case1_dict, k1, uri)
+            case2_dict[k2] = update_dict(case2_dict, k2, uri)
+            case3_dict[k3] = update_dict(case3_dict, k3, uri)
+            case4_dict[k4] = update_dict(case4_dict, k4, uri)
+            case5_dict[k5] = update_dict(case5_dict, k5, uri)
+            case6_dict[k6] = update_dict(case6_dict, k6, uri)
+        elif len(fname) > 0 and len(mname) == 0:
+
+            # three cases here
+
+            k0 = vivotools.key_string(lname)
+            k1 = vivotools.key_string(lname + ':' + fname[0])
+            k2 = vivotools.key_string(lname + ':' + fname)
+            case0_dict[k0] = update_dict(case0_dict, k0, uri)
+            case1_dict[k1] = update_dict(case1_dict, k1, uri)
+            case2_dict[k2] = update_dict(case2_dict, k2, uri)
+        elif len(fname) == 0 and len(mname) == 0:
+
+            # one case here
+
+            k0 = vivotools.key_string(lname)
+            case0_dict[k0] = update_dict(case0_dict, k0, uri)
+        i = i + 1
+    return [case0_dict, case1_dict, case2_dict, case3_dict, case4_dict,\
+        case5_dict, case6_dict]
+
+def find_author(author):
+    """
+    Given an author name in the form last, first middle with middle
+    and/or first eitehr blank or single character with or with periods,
+    find the name in the appropriate case dictionary.  The
+    case dictionaries are prepared using make_people_dictionaries
+    """
+    [lname, fname, mname, case] = name_parts(author)
+    [case0_dict, case1_dict, case2_dict, case3_dict, case4_dict,\
+        case5_dict, case6_dict] = dictionaries
+    if case == 0:
+        k0 = vivotools.key_string(lname)
+        result = case0_dict.get(k0, [])
+    elif case == 1:
+        k1 = vivotools.key_string(lname + ':' + fname[0])
+        result = case1_dict.get(k1, [])
+    elif case == 2:
+        k2 = vivotools.key_string(lname + ':' + fname)
+        result = case2_dict.get(k2, [])
+    elif case == 3:
+        k3 = vivotools.key_string(lname + ':' + fname[0] +':' + mname[0])
+        result = case3_dict.get(k3, [])
+    elif case == 4:
+        k4 = vivotools.key_string(lname + ':' + fname[0] + ':' + mname)
+        result = case4_dict.get(k4, [])
+    elif case == 5:
+        k5 = vivotools.key_string(lname + ':' + fname + ':' + mname[0])
+        result = case5_dict.get(k5, [])
+    else:
+        k6 = vivotools.key_string(lname + ':' + fname + ':' + mname)
+        result = case6_dict.get(k6, [])
+    return result
+
+def uf_affiliation(affiliation):
+    """
+    Given an affiliation string, return true if the affiliation is for
+    UF, False if not
+    """
+
+    #  Is this list of authors a UF list?
+
+    k1 = affiliation.find("Gainesville")
+    k2 = affiliation.find("Univ Fl")
+    k3 = affiliation.find("UNIV FL")
+    k4 = affiliation.find("UF Col Med")
+    k5 = affiliation.find("UF Coll Med")
+    isUF_affiliation = k1 >= 0 or k2 >= 0 or k3 >= 0 or k4 >= 0 or\
+        k5 >= 0
+    return isUF_affiliation
+
+def make_authors(value, debug=False):
+    """
+    Given a bibtex publication value, return a dictionary, one entry per
+    author.  The key is the author name, the value is a list = order,
+    corresponding author (t/f), UF author (t/f), corporate
+    author (t/f), last, first, middle and case.  Case is an integer
+    from 0 to 6 indicating how much of a name we actually have.  See
+    name_parts for description.
+
+    To do:  Add code to improve parsing of similar names.  The current
+    code can be confused if author names are subsets, such as Childs, A.
+    and Childs, A. Baker
+    """
+    authors = {}
+    try:
+        author_names = value.fields['author'].split(' and ')
+    except:
+        author_names = []
+    try:
+        affiliation_text = value.fields['affiliation']
+    except:
+        affiliation_text = ""
+    if len(author_names) > MAX_AUTHORS:
+        other_authors = ";".join(author_names[MAX_AUTHORS:])
+        author_names = author_names[0:MAX_AUTHORS]
+        author_names.append(other_authors)
+
+    #  prepare the affiliation_list
+
+    order = 0
+    for author in author_names:
+        order = order + 1
+        if order > MAX_AUTHORS:
+            authors[author] = [order, False, False, True, author,
+                "", "", None]
+            break
+        authors[author] = [order, False, False, False] + name_parts(author)
+        k = affiliation_text.find(author)
+        auth = author
+        auth = author.replace('.', '+')
+        if auth == author:
+            continue # nothing to do, there are no periods to replace
+        else:
+            while k >= 0:
+                affiliation_text = affiliation_text.replace(author, "/" +\
+                    auth + "/", 1)
+                k = affiliation_text.find(author)
+    affiliation_list = affiliation_text.split('.')
+    affiliation_list = affiliation_list[0:-1]
+
+    # find the corresponding author. Corresponding authors are not listed by
+    # full name. Typically they are listed by last name, first initial, but
+    # other variants are used. Here we match only on the last name, which
+    # could result in an error if two authors have the same last name and
+    # the first one is not the corresponding author
+
+    for affiliation in affiliation_list:
+        for author in author_names:
+            last_name = authors[author][4]
+            if affiliation.find(last_name) >= 0 and\
+                affiliation.find('(Reprint Author)') >= 0:
+                authors[author][1] = True
+
+                # while we are here, check to see if this is a UF affiliation.
+                # If it is, mark the found corresponding author as a UF
+                # author.  This handles a nasty edge case where the
+                # corresponding author might have a UF affiliation in the
+                # corresponding author affiliation, but a non-UF affiliation
+                # in the regular affiliation fields.
+
+                if uf_affiliation(affiliation):
+                    authors[author][2] = True
+                break
+
+    # find the UF authors.  For each affiliation, look to see if it is a UF
+    # affiliation. if it is, all authors found in it are UF authors.  If not,
+    # all authors are not UF authors.  If one person is found in two
+    # affiliations and is a UF author in either one, the the author is a UF
+    # author.
+    #
+    # if all the affiliations are UF affiliations, then all the authors are
+    # UF authors
+
+    count_uf_affiliations = 0
+    for a in affiliation_list:
+        if uf_affiliation(a):
+            count_uf_affiliations = count_uf_affiliations + 1
+    if len(affiliation_list) == count_uf_affiliations:
+
+        # all affiliations are UF, so all authors are UF
+
+        for author in author_names:
+            authors[author][2] = True
+    else:
+
+        # Not all the affiliations are UF, so we need to check each one
+
+        for a in affiliation_list:
+            affiliation = a.replace('+', '.')
+            if uf_affiliation(affiliation):
+                if len(author_names) == 1:
+                    authors[author_names[0]][2] = True
+                else:
+                    for author in author_names:
+                        if debug:
+                            print "...Looking for>" + author +\
+                                "< in UF affiliation>" + affiliation + "<"
+                        if affiliation.find(author) >= 0:
+                            authors[author][2] = True
+    return authors
+
+def count_uf_authors(authors, debug=False):
+    """
+    Given an author structure from make_authors, return the count of UF authors
+    """
+    count = 0
+    for value in authors.values():
+        if value[2]:
+            count = count + 1
+    if debug:
+        print "UF author count is ", count
+    return count
+
+def update_author_report(authors):
+    """
+    Given an authors structure, update the author_report for each author
+    """
+
+    # accumulate all the authors in a structure for reporting
+
+    for author, value in authors.items():
+        if author in author_report:
+            result = author_report[author]
+            result[len(result.keys())+1] = value
+            author_report[author] = result
+        else:
+            author_report[author] = {1:value}
+    return
+
+def make_author_rdf(value):
+    """
+    Given a bibtex publication value, create the RDF for the authors
+    of the publication.  Some authors may need to be created, while others
+    may be found in VIVO.
+
+    For each author:
+      Is author UF?
+      Yes:
+        How many authors at UF have this name?
+        0:  Add the author, add to notify list
+        1:  Get the URI for inclusion in the authorship
+        2:  Punt the whole publication to the manual disambiguation list
+      No:
+        Create a new stub for the author (corporate or single).  Return the
+        URI for authorship.
+    If no UF authors, punt the whole publication to the error list
+    Otherwise produce RDF for authors to be added
+    Return the URIs of all authors (found or added)
+    """
+    author_template = tempita.Template("""
+    <rdf:Description rdf:about="{{author_uri}}">
+        <rdfs:label>{{author_name}}</rdfs:label>
+        {{if len(first) > 0:}}
+            <foaf:firstName>{{first}}</foaf:firstName>
+        {{endif}}
+        {{if len(middle)>0:}}
+            <core:middleName>{{middle}}</core:middleName>
+        {{endif}}
+        <foaf:lastName>{{last}}</foaf:lastName>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+        {{if isUF:}}
+            <rdf:type rdf:resource="http://vivo.ufl.edu/ontology/vivo-ufl/UFEntity"/>
+        {{endif}}
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+    corporate_author_template = tempita.Template("""
+    <rdf:Description rdf:about="{{author_uri}}">
+        <rdfs:label>{{group_name}}</rdfs:label>
+        <core:overview>{{author_name}}</core:overview>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Group"/>
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+    rdf = ""
+    authors = make_authors(value)
+    for author, value in authors.items():
+        isUF = value[2]
+        isCorporate = value[3]
+        if isUF:
+            if author in author_report:
+
+                # UF author previously found in this Python Pubs run.
+                # Use the URI previously assigned to this author
+
+                author_uri = author_report[author][1][-1]
+                action = "Found UF"
+                rdf = rdf + "\n<!-- Previously found UF author " + author +\
+                    " with uri " + author_uri + " -->"
+            else:
+
+                # Look for the author in VIVO
+
+                result = find_author(author)
+
+                # How many people did you find with this author name?
+
+                count = len(result)
+                if count == 0:
+
+                    # create a new UF author, and notify
+
+                    author_uri = vivotools.get_vivo_uri()
+                    action = "Make UF "
+                    harvest_datetime = vivotools.make_harvest_datetime()
+                    rdf = rdf + "\n<!-- UF author stub RDF for " + author +\
+                        " at uri " + author_uri + " and notify -->"
+                    rdf = rdf + author_template.substitute(isUF=isUF,\
+                        author_uri=author_uri, author_name=author,\
+                        first=value[5], middle=value[6], last=value[4],\
+                        harvest_datetime=harvest_datetime)
+                elif count == 1:
+
+                    # Bingo! Disambiguated UF author. Add URI
+
+                    author_uri = result[0]
+                    action = "Found UF"
+                    rdf = rdf + "\n<!-- Found UF author " + author +\
+                        " with uri " + author_uri + " -->"
+                else:
+
+                    # More than 1 UF author has this name.  Add to the
+                    # disambiguation list
+
+                    author_uri = ";".join(result)
+                    action = "Disambig"
+                    rdf = rdf + "\n<!-- " + str(count) +\
+                        " UF people found with name " + author +\
+                        " Disambiguation required -->"
+        elif isCorporate:
+
+            # Corporate author
+
+            author_uri = vivotools.get_vivo_uri()
+            action = "Corp Auth"
+            group_name = title + " Authorship Group"
+            harvest_datetime = vivotools.make_harvest_datetime()
+            rdf = rdf + "\n<!-- Corporate author stub RDF for " + author +\
+                " at uri " + author_uri + " -->"
+            rdf = rdf + corporate_author_template.substitute(\
+                author_uri=author_uri, author_name=author,\
+                group_name=group_name, harvest_datetime=harvest_datetime)
+        else:
+
+            # Non UF author -- create a stub
+
+            author_uri = vivotools.get_vivo_uri()
+            action = "non UF  "
+            harvest_datetime = vivotools.make_harvest_datetime()
+            rdf = rdf + "\n<!-- Non-UF author stub RDF for " + author +\
+                " at uri " + author_uri + " -->"
+            rdf = rdf + author_template.substitute(isUF=isUF,\
+                author_uri=author_uri, author_name=author,\
+                first=value[5], middle=value[6], last=value[4],\
+                harvest_datetime=harvest_datetime)
+
+        # For each author, regardless of the cases above, record whether this
+        # author needs to be created and
+        # what URI refers to the author (a new URI if author will be created,
+        # otherwise an existing URI)
+
+        authors[author].append(action)
+        authors[author].append(author_uri)
+    return [rdf, authors]
+
+def make_authorship_rdf(authors, publication_uri):
+    """
+    Given the authors structure (see make_authors), and the uri of the
+    publication, create the RDF for the authorships of the publication.
+    Authorships link authors to publications, supporting the many-to-many
+    relationship between authors and publications.
+    """
+    authorship_template = tempita.Template("""
+    <rdf:Description rdf:about="{{authorship_uri}}">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdf:type rdf:resource="http://vivoweb.org/ontology/core#Authorship"/>
+        <core:linkedAuthor rdf:resource="{{author_uri}}"/>
+        <core:linkedInformationResource rdf:resource="{{publication_uri}}"/>
+        <core:authorRank>{{author_rank}}</core:authorRank>
+        <core:isCorrespondingAuthor>{{corres_auth}}</core:isCorrespondingAuthor>
+    </rdf:Description>
+    """)
+    rdf = ""
+    authorship_uris = {}
+    for author, value in authors.items():
+        author_rank = value[0]
+        authorship_uri = vivotools.get_vivo_uri()
+        authorship_uris[author] = authorship_uri
+        if value[8] == "Disambig":
+            author_uri = value[9].split(";")[0] # take first URI if multiple
+        else:
+            author_uri = value[9]
+        corres_auth = value[1]
+        harvest_datetime = vivotools.make_harvest_datetime()
+        rdf = rdf + "\n<!-- Authorship for " + author + "-->"
+        rdf = rdf + authorship_template.substitute(\
+            authorship_uri=authorship_uri, author_uri=author_uri,\
+            publication_uri=publication_uri, author_rank=author_rank,\
+            corres_auth=corres_auth, harvest_datetime=harvest_datetime)
+    return [rdf, authorship_uris]
+
+def make_author_in_authorship_rdf(authors, authorship_uris):
+    """
+    Given the authorship_uris (see make_authorship_rdf), and the uri of the
+    publication, create the RDF for the AuthorInAuthorship relationships of
+    people to authorships.
+    """
+    author_in_authorship_template = tempita.Template("""
+    <rdf:Description rdf:about="{{author_uri}}">
+        <core:authorInAuthorship rdf:resource="{{authorship_uri}}"/>
+    </rdf:Description>
+    """)
+    rdf = ""
+    for author, value in authors.items():
+        if value[8] == "Disambig":
+            author_uri = value[9].split(";")[0] # take first URI if multiple
+        else:
+            author_uri = value[9]
+        authorship_uri = authorship_uris[author]
+        harvest_datetime = vivotools.make_harvest_datetime()
+        rdf = rdf + "\n<!-- AuthorshipInAuthorship for " + author + "-->"
+        rdf = rdf + author_in_authorship_template.substitute(\
+            author_uri=author_uri, authorship_uri=authorship_uri,\
+            harvest_datetime=harvest_datetime)
+    return rdf
+
+def make_journal_publication_rdf(journal_uri, publication_uri):
+    """
+    Create the assertions publicationVenueFor and hasPublicationVenue between
+    a journal and a publication
+    """
+    journal_publication_template = tempita.Template("""
+    <rdf:Description rdf:about="{{journal_uri}}">
+        <core:publicationVenueFor  rdf:resource="{{publication_uri}}"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="{{publication_uri}}">
+        <core:hasPublicationVenue rdf:resource="{{journal_uri}}"/>
+    </rdf:Description>
+    """)
+    rdf = ""
+    harvest_datetime = vivotools.make_harvest_datetime()
+    rdf = rdf + "\n<!-- Journal/publication assertions for " +\
+        journal_name + " and " + title + " -->"
+    rdf = rdf + journal_publication_template.substitute(\
+        publication_uri=publication_uri, journal_uri=journal_uri,\
+        harvest_datetime=harvest_datetime)
+    return rdf
+
+def map_bibtex_type(bibtex_type):
+    """
+    Given a bibtex_type from TR, map to a VIVO document type
+    """
+    map = {"article":"article",
+        "book":"book",
+        "booklet":"document",
+        "conference":"conferencePaper",
+        "inbook":"bookSection",
+        "incollection":"documentPart",
+        "inproceedings":"conferencePaper",
+        "manual":"manual",
+        "mastersthesis":"thesis",
+        "misc":"document",
+        "phdthesis":"thesis",
+        "proceedings":"proceedings",
+        "techreport":"report",
+        "unpublished":"document"}
+    return map.get(bibtex_type, "document")
+
+def map_tr_types(tr_types_value, debug=False):
+    """
+    Given a string of TR type information, containing one or more types
+    separated by semi-colons, map each one, returning a list of mapped
+    values
+    """
+    map = {"bookreview":"review",
+        "correction":"document",
+        "editorial material":"editorialArticle",
+        "review":"review",
+        "article":"article",
+        "proceedings paper":"conferencePaper",
+        "newsitem":"article",
+        "letter":"document",
+        "theater review":"review"}
+    tr_list = tr_types_value.split(";")
+    if debug:
+        print "tr_list", tr_list
+    vivo_types = []
+    for a in tr_list:
+        b = a.strip()
+        tr_type = b.lower()
+        vivo_type = map.get(tr_type, "document")
+        if len(vivo_types) == 0:
+            vivo_types = [vivo_type]
+        else:
+            if vivo_type not in vivo_types:
+                vivo_types.append(vivo_type)
+    if debug:
+        print vivo_types
+    return vivo_types
+
+def map_publication_types(value, debug=False):
+    """
+    Given a bibtex publication value, find the bibtex type and map to VIVO
+    Then get the Thomson-Reuters types and map them to VIVO.
+    Then merge the two lists and return all the types
+    """
+
+    # Get and map the bibtex type
+
+    try:
+        bibtex_type = value.type
+    except:
+        bibtex_type = "article"
+    vivo_type = map_bibtex_type(bibtex_type)
+
+    # get and map the TR types
+
+    try:
+        tr_types_value = value.fields['type']
+    except:
+        tr_types_value = ""
+    vivo_types_from_tr = map_tr_types(tr_types_value, debug=debug)
+
+    #  combine the values and return
+
+    if vivo_type not in vivo_types_from_tr:
+        vivo_types_from_tr.append(vivo_type)
+    if debug:
+        print "bibtex type", bibtex_type, "vivo type", vivo_type
+        print "tr_types_value", tr_types_value, "vivo types",\
+            vivo_types_from_tr
+        print vivo_types_from_tr
+    return vivo_types_from_tr
+
+def make_publication_rdf(value, title, publication_uri, datetime_uri,\
+        authorship_uris):
+    """
+    Given a bibtex publication value and previously created or found URIs,
+    create the RDF for the publication itself. The publication will link to
+    previously created or discovered objects, including the timestamp, the
+    journal and the authorships
+    """
+    publication_template = tempita.Template("""
+    <rdf:Description rdf:about="{{publication_uri}}">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+        <rdfs:label>{{title}}</rdfs:label>
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Document"/>
+        {{for type in types:}}
+            {{if type=="article"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/AcademicArticle"/>
+            {{endif}}
+            {{if type=="book"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/Book"/>
+            {{endif}}
+            {{if type=="document"}}
+            {{endif}}
+            {{if type=="conferencePaper"}}
+                <rdf:type rdf:resource="http://vivoweb.org/ontology/core#ConferencePaper"/>
+            {{endif}}
+            {{if type=="bookSection"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/BookSection"/>
+            {{endif}}
+            {{if type=="documentPart"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+            {{endif}}
+            {{if type=="manual"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/Manual"/>
+            {{endif}}
+            {{if type=="thesis"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/Thesis"/>
+            {{endif}}
+            {{if type=="proceedings"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/Proceedings"/>
+            {{endif}}
+            {{if type=="report"}}
+                <rdf:type rdf:resource="http://purl.org/ontology/bibo/Report"/>
+            {{endif}}
+            {{if type=="review"}}
+                <rdf:type rdf:resource="http://vivoweb.org/ontology/core#Review"/>
+            {{endif}}
+            {{if type=="editorialArticle"}}
+                <rdf:type rdf:resource="http://vivoweb.org/ontology/core#EditorialArticle"/>
+            {{endif}}
+        {{endfor}}
+        {{if len(doi) > 0:}}
+            <bibo:doi>{{doi}}</bibo:doi>
+        {{endif}}
+        {{if len(volume) > 0:}}
+            <bibo:volume>{{volume}}</bibo:volume>
+        {{endif}}
+        {{if len(number) > 0:}}
+            <bibo:number>{{number}}</bibo:number>
+        {{endif}}
+        {{if len(start) > 0:}}
+            <bibo:pageStart>{{start}}</bibo:pageStart>
+        {{endif}}
+        {{if len(end) > 0:}}
+            <bibo:pageEnd>{{end}}</bibo:pageEnd>
+        {{endif}}
+        {{for author,authorship_uri in authorship_uris:}}
+            <core:informationResourceInAuthorship
+                rdf:resource="{{authorship_uri}}"/>
+        {{endfor}}
+        <core:dateTimeValue rdf:resource="{{datetime_uri}}"/>
+        <ufVivo:harvestedBy>Python Pubs version 1.3</ufVivo:harvestedBy>
+        <ufVivo:dateHarvested>{{harvest_datetime}}</ufVivo:dateHarvested>
+    </rdf:Description>
+    """)
+
+    # get publication attributes from the bibtex value.  In each case, use
+    # a try-except construct in case the named attribute does not exist
+    # in the bibtex.  Not all publications have a doi, for example
+
+    types = map_publication_types(value)
+    try:
+        doi = value.fields['doi']
+        document['doi'] = doi
+    except:
+        doi = ""
+    try:
+        volume = value.fields['volume']
+        document['volume'] = volume
+    except:
+        volume = ""
+    try:
+        number = value.fields['number']
+        document['number'] = number
+    except:
+        number = ""
+
+    # Get the pages element from the bibtex.  If found, try to split it
+    # into start and end
+
+    try:
+        pages = value.fields['pages']
+    except:
+        pages = ""
+    pages_list = pages.split('-')
+    try:
+        start = pages_list[0]
+        document['page_start'] = start
+    except:
+        start = ""
+    try:
+        end = pages_list[1]
+        document['page_end'] = end
+    except:
+        end = ""
+
+    # write out the head, then one line for each authorship, then the tail
+
+    rdf = "\n<!-- Publication RDF for " + title + "-->"
+    harvest_datetime = vivotools.make_harvest_datetime()
+    rdf = rdf + publication_template.substitute(\
+        publication_uri=publication_uri, title=title, doi=doi, volume=volume,\
+        number=number, start=start, end=end, types=types,\
+        datetime_uri=datetime_uri, harvest_datetime=harvest_datetime,\
+        authorship_uris=authorship_uris.items())
+    return rdf
+
+def make_document_authors(authors):
+    """
+    Given the structure returned by make_authors, return the structure needed
+    by document
+    """
+    author_dict = {}
+    for author in authors.values():
+        author_dict["{0:>10}".format(author[0])] = {'first':author[5],\
+         'middle':author[6], 'last':author[4]}
+    return author_dict
+
+def make_pub_datetime(value):
+    """
+    Given a pybtex value structure, return the isoformat date string of the
+    publication date
+
+    To do:
+    --  Return the datetime, not a string
+    --  Pass in a date field, not the entire pybtex value
+    """
+    try:
+        year = int(value.fields['year'])
+    except:
+        year = 2012
+    try:
+        m = value.fields['month'].upper()
+    except:
+        m = 'JAN'
+    month = 1
+    if m.startswith('JAN'):
+        month = 1
+    elif m.startswith('FEB'):
+        month = 2
+    elif m.startswith('MAR'):
+        month = 3
+    elif m.startswith('APR'):
+        month = 4
+    elif m.startswith('MAY'):
+        month = 5
+    elif m.startswith('JUN'):
+        month = 6
+    elif m.startswith('JUL'):
+        month = 7
+    elif m.startswith('AUG'):
+        month = 8
+    elif m.startswith('SEP'):
+        month = 9
+    elif m.startswith('OCT'):
+        month = 10
+    elif m.startswith('NOV'):
+        month = 11
+    elif m.startswith('DEC'):
+        month = 12
+    elif m.startswith('WIN'):
+        month = 1
+    elif m.startswith('SPR'):
+        month = 4
+    elif m.startswith('SUM'):
+        month = 7
+    elif m.startswith('FAL'):
+        month = 10
+    else:
+        month = 1
+    dt = date(year, month, 1)
+    document['date'] = {'month':str(month), 'day':'1', 'year':str(year)}
+    return dt.isoformat()
+
 
 def get_pmid_from_doi(doi, email='mconlon@ufl.edu', tool='PythonQuery',
                       database='pubmed'):
