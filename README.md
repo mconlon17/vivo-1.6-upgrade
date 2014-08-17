@@ -1,4 +1,25 @@
-# VIVO 1.6 Upgrade
+# VIVO 1.6 Upgrade On Hold
+
+*After consideration of the effort required for UF to upgrade to VIVO 1.6, the demands 
+on the UF VIVO support team for additional data, data quality and data products, and
+the possibility of implementing an enterprise solution to manage the data currently
+aggregated in VIVO, we have decided to delay the VIVO 1.6 upgrade indefinitely.  We
+remain fully committed to VIVO and to the assembly and maintenance of the scholarly
+record of UF.  We are do not feel it is in the best interests of the university to 
+upgrade at this time.*
+
+We had hoped to take advantage of the bi-directional API feature of VIVO 1.7 to develop
+tools for managing and displaying VIVO data.  We will develop tools for 1.5, but these will
+be limited to display tools only.
+
+We will upgrade all our ingests and vivotools for 1.5 to improve the functioning of
+the ingests, document their functions, improve separation of enterprise data
+cleaning, abstract representation, and output to a specific ontology.  This effort will
+improve operations and prepare us for future implementation of an enterprise system, 
+VIVO 1.7 or both.  We will migrate the VIVO hosting from AWS to CNS to lower cost of
+operation.
+
+---
 
 Software for upgrading UF VIVO from 1.5.2 to 1.6.3.  Core ingests and tools upgrades.
 
