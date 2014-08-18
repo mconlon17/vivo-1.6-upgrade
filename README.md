@@ -5,7 +5,7 @@ on the UF VIVO support team for additional data, data quality and data products,
 the possibility of implementing an enterprise solution to manage the data currently
 aggregated in VIVO, we have decided to delay the VIVO 1.6 upgrade indefinitely.  We
 remain fully committed to VIVO and to the assembly and maintenance of the scholarly
-record of UF.  We are do not feel it is in the best interests of the university to 
+record of the University of Florida.  We do not feel it is in the best interests of the university to 
 upgrade at this time.*
 
 We had hoped to take advantage of the bi-directional API feature of VIVO 1.7 to develop
